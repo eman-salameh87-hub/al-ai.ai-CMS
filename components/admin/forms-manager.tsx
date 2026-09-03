@@ -2,14 +2,28 @@
 
 import { useState, useTransition } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import { Check, Archive, ArchiveRestore, Trash2, Download, Mail, Loader2 } from 'lucide-react';
+import {
+  Check, Archive, ArchiveRestore, Trash2, Download, Mail, Loader2, Paperclip,
+} from 'lucide-react';
 import { useT, useAdminI18n } from './i18n-provider';
 import { findEmail } from '@/lib/forms/csv';
+import { FORM_TYPES, type FormType, type FormAttachmentSummary } from '@/lib/forms/form-types';
+import type { MessageKey } from '@/lib/admin-i18n/messages';
+
+/** Tab label per form type, so adding a type is a compile error without one. */
+const TAB_LABEL: Record<FormType, MessageKey> = {
+  contact: 'forms.typeContact',
+  newsletter: 'forms.typeNewsletter',
+  career: 'forms.typeCareer',
+  training: 'forms.typeTraining',
+};
 
 export interface SubmissionRow {
   id: string;
-  type: 'contact' | 'newsletter';
+  type: FormType;
   payload: Record<string, string>;
+  /** Present on career and training submissions; null on the other two. */
+  attachments: FormAttachmentSummary[] | null;
   pageSlug: string | null;
   locale: string | null;
   isRead: boolean;
@@ -19,7 +33,7 @@ export interface SubmissionRow {
 
 interface Props {
   rows: SubmissionRow[];
-  type: 'contact' | 'newsletter';
+  type: FormType;
   showArchived: boolean;
   unreadCount: number;
   canDelete: boolean;
@@ -86,7 +100,7 @@ export function FormsManager({ rows, type, showArchived, unreadCount, canDelete 
     <div className="space-y-4" data-test-id="forms-manager">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div role="tablist" aria-label={t('forms.tabs')} className="flex gap-1">
-          {(['contact', 'newsletter'] as const).map((tab) => (
+          {FORM_TYPES.map((tab) => (
             <button
               key={tab}
               type="button"
@@ -100,8 +114,10 @@ export function FormsManager({ rows, type, showArchived, unreadCount, canDelete 
                   : 'text-[var(--admin-text-secondary)] hover:text-[var(--admin-text)]'
               }`}
             >
-              {tab === 'contact' ? t('forms.typeContact') : t('forms.typeNewsletter')}
-              {tab === 'contact' && unreadCount > 0 && (
+              {t(TAB_LABEL[tab])}
+              {/* The badge belongs to whichever tab is selected — see the
+                  unread query in the page component. */}
+              {tab === type && tab !== 'newsletter' && unreadCount > 0 && (
                 <span className="ms-2 rounded-full bg-[var(--admin-accent-muted)] px-2 py-0.5 text-[10px] text-[var(--admin-accent-soft)]">
                   {unreadCount}
                 </span>
@@ -111,7 +127,7 @@ export function FormsManager({ rows, type, showArchived, unreadCount, canDelete 
         </div>
 
         <div className="flex items-center gap-2">
-          {type === 'contact' && (
+          {type !== 'newsletter' && (
             <button
               type="button"
               onClick={() => navigate({ archived: showArchived ? null : '1' })}
@@ -149,7 +165,7 @@ export function FormsManager({ rows, type, showArchived, unreadCount, canDelete 
               <div
                 key={row.id}
                 className={`admin-card flex flex-wrap items-start justify-between gap-4 py-4 ${
-                  !row.isRead && type === 'contact'
+                  !row.isRead && type !== 'newsletter'
                     ? 'border-s-2 border-s-[var(--admin-accent)]'
                     : ''
                 }`}
@@ -172,6 +188,37 @@ export function FormsManager({ rows, type, showArchived, unreadCount, canDelete 
                     </dl>
                   )}
 
+                  {/*
+                    The applicant's files.
+                    
+                    A plain link, not a fetch + Blob: the route answers with
+                    Content-Disposition: attachment, and a script-driven save is
+                    blocked in some embedding contexts where an attachment
+                    response never is. The href is an authenticated app route,
+                    never a public bucket URL — see the download handler.
+                  */}
+                  {row.attachments && row.attachments.length > 0 && (
+                    <ul className="flex flex-wrap gap-2 pt-1">
+                      {row.attachments.map((file, index) => (
+                        <li key={`${row.id}-${index}`}>
+                          <a
+                            href={file.url}
+                            className="inline-flex items-center gap-1.5 rounded border border-[var(--admin-line)] px-2 py-1 text-[11px] text-[var(--admin-text-secondary)] hover:text-[var(--admin-text)]"
+                            data-test-id={`form-attachment-${row.id}-${index}`}
+                          >
+                            <Paperclip size={11} aria-hidden="true" />
+                            <span dir="auto" className="max-w-[220px] truncate">
+                              {file.originalName}
+                            </span>
+                            <span className="text-[var(--admin-text-muted)]">
+                              {(file.size / 1024).toFixed(0)} KB
+                            </span>
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+
                   <p className="text-[11px] text-[var(--admin-text-muted)]">
                     {row.pageSlug ? `${row.pageSlug} · ` : ''}
                     <span dir="ltr">{dateFor(row.createdAt)}</span>
@@ -181,7 +228,7 @@ export function FormsManager({ rows, type, showArchived, unreadCount, canDelete 
                 <div className="flex shrink-0 items-center gap-1">
                   {busy && <Loader2 size={14} className="animate-spin" aria-hidden="true" />}
 
-                  {type === 'contact' && (
+                  {type !== 'newsletter' && (
                     <>
                       <button
                         type="button"

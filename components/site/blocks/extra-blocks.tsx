@@ -4,8 +4,11 @@
 import Image from 'next/image';
 import { cache } from 'react';
 import { db } from '@/lib/db';
-import { content, contentI18n, settings } from '@/lib/db/schema';
-import { and, desc, eq } from 'drizzle-orm';
+import Link from 'next/link';
+import {
+  content, contentI18n, contentTypes, contentCategories, categories, settings,
+} from '@/lib/db/schema';
+import { and, desc, eq, sql } from 'drizzle-orm';
 import { cn } from '@/lib/utils';
 import type { ContentBlock } from '@/lib/blocks/types';
 
@@ -344,7 +347,21 @@ export async function SocialLinksBlock({
   );
 }
 
-/** Async server component — queries published posts directly. */
+/**
+ * A card row of one content type's recent entries.
+ *
+ * THREE BUGS FIXED HERE, all of them silent:
+ *
+ *  1. There was no type filter. The query was `where(status = 'published')`
+ *     and nothing else, so on a site with a client catalogue and a service
+ *     catalogue this block listed pages, clients, services and achievements
+ *     interleaved as one feed.
+ *  2. `block.category` was declared in the union and never read, so scoping a
+ *     row to a category did nothing at all.
+ *  3. The link was `/{locale}/{slug}`, which is only correct for `page`.
+ *     A client entry linked to /en/stc — a 404 — instead of /en/clients/stc,
+ *     because the type's routePrefix was not in the URL.
+ */
 export async function RecentPostsBlock({
   block,
   locale,
@@ -352,40 +369,107 @@ export async function RecentPostsBlock({
   block: Pick_<'recent-posts'>;
   locale: 'ar' | 'en';
 }) {
+  // `post` is the default, which is what the block's name has always implied
+  // and what every existing use of it meant.
+  const typeSlug = block.contentType?.trim() || 'post';
+
+  const [type] = await db
+    .select({ id: contentTypes.id, routePrefix: contentTypes.routePrefix })
+    .from(contentTypes)
+    .where(eq(contentTypes.slug, typeSlug))
+    .limit(1);
+
+  // A block pointing at a type that no longer exists renders nothing rather
+  // than falling back to listing everything.
+  if (!type) return null;
+
+  const conditions = [eq(content.status, 'published'), eq(content.typeId, type.id)];
+
+  /*
+   * The category scope, now actually applied.
+   *
+   * An EXISTS subquery rather than a join: a join against content_categories
+   * would return one row per matching category and duplicate an entry filed
+   * under two of them.
+   */
+  if (block.category?.trim()) {
+    conditions.push(
+      sql`exists (
+        select 1 from ${contentCategories}
+        join ${categories} on ${categories.id} = ${contentCategories.categoryId}
+        where ${contentCategories.contentId} = ${content.id}
+          and ${categories.slug} = ${block.category.trim()}
+      )`
+    );
+  }
+
   const rows = await db
     .select({
       slug: content.slug,
       title: contentI18n.title,
       excerpt: contentI18n.excerpt,
+      featuredImage: content.featuredImage,
     })
     .from(content)
-    .leftJoin(
+    // innerJoin, not leftJoin: an entry with no translation for this locale
+    // rendered as its own slug where a title should be.
+    .innerJoin(
       contentI18n,
       and(eq(content.id, contentI18n.contentId), eq(contentI18n.locale, locale))
     )
-    .where(eq(content.status, 'published'))
+    .where(and(...conditions))
     .orderBy(desc(content.publishedAt))
     .limit(Math.min(Math.max(block.count, 1), 12));
 
   if (rows.length === 0) return null;
 
+  /** The type's own URL shape. `page` entries sit at the locale root. */
+  const hrefFor = (slug: string) =>
+    type.routePrefix ? `/${locale}/${type.routePrefix}/${slug}` : `/${locale}/${slug}`;
+
   return (
     <section>
-      {block.title && <h2 className="mb-4 text-xl font-bold text-site-ink">{block.title}</h2>}
+      {block.title && (
+        <h2 className="font-display mb-6 text-2xl font-bold text-site-ink">{block.title}</h2>
+      )}
       <div
         className={cn(
-          block.layout === 'grid' ? 'grid gap-6 sm:grid-cols-2 lg:grid-cols-3' : 'space-y-4'
+          block.layout === 'grid'
+            ? 'grid gap-6 sm:grid-cols-2 lg:grid-cols-3'
+            : block.layout === 'carousel'
+              ? 'flex snap-x snap-mandatory gap-6 overflow-x-auto pb-4'
+              : 'space-y-4'
         )}
       >
         {rows.map((row) => (
-          <a
+          <Link
             key={row.slug}
-            href={`/${locale}/${row.slug}`}
-            className="block rounded-lg border border-site-line p-4 hover:bg-site-surface-raised"
+            href={hrefFor(row.slug)}
+            className={cn(
+              'group block overflow-hidden rounded-xl border border-site-line transition hover:border-[var(--site-accent)] hover:shadow-lg',
+              block.layout === 'carousel' && 'w-72 shrink-0 snap-start'
+            )}
           >
-            <h3 className="font-semibold text-site-ink">{row.title ?? row.slug}</h3>
-            {row.excerpt && <p className="mt-1 text-sm text-site-ink-muted">{row.excerpt}</p>}
-          </a>
+            {row.featuredImage && (
+              <div className="relative aspect-[16/10] overflow-hidden bg-site-surface-raised">
+                <Image
+                  src={row.featuredImage}
+                  alt=""
+                  fill
+                  sizes="(max-width: 640px) 100vw, 33vw"
+                  className="object-cover transition duration-500 group-hover:scale-105"
+                />
+              </div>
+            )}
+            <div className="p-5">
+              <h3 className="font-semibold text-site-ink group-hover:text-[var(--site-accent)]">
+                {row.title}
+              </h3>
+              {row.excerpt && (
+                <p className="mt-2 line-clamp-3 text-sm text-site-ink-muted">{row.excerpt}</p>
+              )}
+            </div>
+          </Link>
         ))}
       </div>
     </section>

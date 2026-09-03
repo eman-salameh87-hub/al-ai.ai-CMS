@@ -5,6 +5,7 @@ import { contentTypes, content } from '@/lib/db/schema';
 import { and, asc, eq, sql } from 'drizzle-orm';
 import { prefixProblem, normalisePrefix, isBuiltInType } from './type-registry';
 import { locales } from '@/lib/env';
+import { parseFieldDefinitions, type FieldDefinition } from './custom-fields';
 
 export interface ContentTypeRow {
   id: string;
@@ -19,6 +20,15 @@ export interface ContentTypeRow {
   isActive: boolean;
   isBuiltIn: boolean;
   entryCount: number;
+  /**
+   * The type's field definitions, so the admin screen can edit them.
+   *
+   * Typed as FieldDefinition[] and parsed on the way out, not `unknown`: this
+   * column predates the field system and can hold anything, and every consumer
+   * would otherwise have to re-parse it.
+   */
+  customFields: FieldDefinition[];
+  sortOrder: number;
 }
 
 export async function listContentTypes(): Promise<ContentTypeRow[]> {
@@ -38,11 +48,18 @@ export async function listContentTypes(): Promise<ContentTypeRow[]> {
       entryCount: sql<number>`(
         select count(*) from ${content} where ${content.typeId} = content_types.id
       )::int`,
+      customFields: contentTypes.customFields,
+      sortOrder: sql<number>`coalesce(${contentTypes.sortOrder}, 0)`,
     })
     .from(contentTypes)
     .orderBy(asc(contentTypes.sortOrder), asc(contentTypes.slug));
 
-  return rows;
+  // Parsed once here rather than at every call site. An unparseable value
+  // becomes an empty list, so a legacy row cannot break the screen.
+  return rows.map((row) => ({
+    ...row,
+    customFields: parseFieldDefinitions(row.customFields),
+  }));
 }
 
 /** Prefixes already spoken for, so a new type cannot claim one twice. */

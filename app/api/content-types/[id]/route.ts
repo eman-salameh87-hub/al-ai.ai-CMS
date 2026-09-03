@@ -6,6 +6,7 @@ import { contentTypes } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 import { requireApiAuth } from '@/lib/auth/api-guard';
 import { checkPrefix, canDelete } from '@/lib/content/types-admin';
+import { fieldDefinitionsSchema } from '@/lib/content/custom-fields';
 
 export const runtime = 'nodejs';
 
@@ -21,6 +22,11 @@ const patchSchema = z.object({
   hasFeaturedImage: z.boolean(),
   isActive: z.boolean(),
   sortOrder: z.number().int().min(0).max(9999),
+  /**
+   * Optional on PATCH so a caller that only changes the name does not have to
+   * resend the field list — and, more importantly, cannot wipe it by omission.
+   */
+  customFields: fieldDefinitionsSchema.optional(),
 });
 
 export async function PATCH(request: Request, ctx: { params: Promise<{ id: string }> }) {
@@ -38,9 +44,15 @@ export async function PATCH(request: Request, ctx: { params: Promise<{ id: strin
       return NextResponse.json({ success: false, error: { message: prefix.message } }, { status: 400 });
     }
 
+    // `customFields` is spread only when supplied, for the reason above.
+    const { customFields, ...rest } = data;
     await db
       .update(contentTypes)
-      .set({ ...data, routePrefix: prefix.value })
+      .set({
+        ...rest,
+        routePrefix: prefix.value,
+        ...(customFields === undefined ? {} : { customFields }),
+      })
       .where(eq(contentTypes.id, id));
 
     return NextResponse.json({ success: true });

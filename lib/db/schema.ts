@@ -20,6 +20,7 @@ import { relations, sql } from 'drizzle-orm';
  */
 export const orderNumberSeq = pgSequence('order_number_seq', { startWith: 1000 });
 import type { ContentBlock } from '../blocks/types';
+import type { FormAttachment } from '../forms/attachment-types';
 
 // Enums
 export const userRoleEnum = pgEnum('user_role', ['admin', 'editor', 'author']);
@@ -155,6 +156,20 @@ export const content = pgTable('content', {
   slug: varchar('slug', { length: 255 }).notNull(),
   authorId: uuid('author_id').references(() => users.id),
   featuredImage: text('featured_image'),
+  /**
+   * Values for the fields their content type declares in
+   * `contentTypes.customFields`. Locale-independent by design: a client's
+   * country, a service's video URL and a course's department are the same fact
+   * in Arabic and English, and duplicating them into content_i18n would create
+   * two answers to one question. Anything that genuinely differs per locale is
+   * a translation and belongs in a block.
+   *
+   * Shape is `{ [fieldKey]: value }`, validated against the type's definition
+   * on write by lib/content/custom-fields.ts. jsonb rather than a column per
+   * field, for the same reason `settings.theme` is: adding a field is an
+   * editor action, and it must not require a migration.
+   */
+  customFieldValues: jsonb('custom_field_values').$type<Record<string, unknown>>(),
   status: contentStatusEnum('status').default('draft'),
   publishedAt: timestamp('published_at'),
   createdAt: timestamp('created_at').defaultNow(),
@@ -878,12 +893,33 @@ export const bundleItemsRelations = relations(bundleItems, ({ one }) => ({
 // Backs the contact-form and newsletter blocks. Payload is jsonb because the
 // field set is author-configurable per block.
 
-export const formTypeEnum = pgEnum('form_type', ['contact', 'newsletter']);
+/**
+ * `career` and `training` are the two application forms the legacy site had
+ * and this one did not. They are form types rather than a content type because
+ * an application is a SUBMISSION: it belongs in the same inbox, with the same
+ * read/archive states, CSV export and rate limiting, as every other thing a
+ * visitor sends.
+ */
+export const formTypeEnum = pgEnum('form_type', [
+  'contact', 'newsletter', 'career', 'training',
+]);
 
 export const formSubmissions = pgTable('form_submissions', {
   id: uuid('id').primaryKey().defaultRandom(),
   type: formTypeEnum('type').notNull(),
   payload: jsonb('payload').$type<Record<string, string>>().notNull(),
+  /**
+   * Files the applicant attached — a CV, a portfolio PDF.
+   *
+   * Stored as metadata plus the storage key, NOT as a media_assets row: the
+   * media library is a curated place an editor browses and reuses, and a
+   * stranger's uploaded CV must never appear in it. The file lives in the same
+   * storage layer under a separate prefix, and lib/forms/uploads.ts is the only
+   * thing that puts anything here.
+   *
+   * Null for contact and newsletter, which take no files.
+   */
+  attachments: jsonb('attachments').$type<FormAttachment[]>(),
   pageSlug: varchar('page_slug', { length: 255 }),
   locale: localeEnum('locale'),
   ipAddress: varchar('ip_address', { length: 45 }),
@@ -897,4 +933,49 @@ export const formSubmissions = pgTable('form_submissions', {
   createdAt: timestamp('created_at').defaultNow(),
 }, (table) => ({
   typeCreatedIdx: index('form_submissions_type_created_idx').on(table.type, table.createdAt),
+}));
+
+// ─── REDIRECTS ────────────────────────────────────────────
+/**
+ * One-off URL moves, recorded as content migrates.
+ *
+ * The bulk of the legacy address space is a RULE, not data — eleven prefix
+ * renames plus "lowercase the slug" — and it lives in
+ * lib/redirects/legacy-map.ts so middleware can apply it on the Edge with no
+ * query. This table is for the moves no rule can express:
+ *
+ *   - /Blog/482, where the legacy key was a numeric id and the new one is a
+ *     slug, so only a lookup can connect them;
+ *   - a slug an editor changed during the import ("Alawwal-bank" is now
+ *     "sab-bank"), which the rule would confidently 308 to a 404;
+ *   - anything a client sends later from a print campaign or an old PDF.
+ *
+ * `source` is stored normalised — leading slash, no trailing slash, no query,
+ * lowercased — because a redirect table that misses on a capitalisation is
+ * worse than no table: it looks configured and does nothing.
+ */
+export const redirects = pgTable('redirects', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  source: varchar('source', { length: 500 }).notNull().unique(),
+  destination: varchar('destination', { length: 500 }).notNull(),
+  /**
+   * 301 or 302 only. 308/307 preserve the request method, which is correct for
+   * an API and wrong here: a form POSTed to a moved page should not be
+   * re-POSTed to the new one behind the user's back.
+   */
+  statusCode: integer('status_code').default(301).notNull(),
+  isActive: boolean('is_active').default(true).notNull(),
+  /**
+   * Hit counting is what turns this table from a config file into a report:
+   * a rule with zero hits after a month is a rule you can retire, and a
+   * spike on one source is a link someone is still publishing.
+   */
+  hits: integer('hits').default(0).notNull(),
+  lastHitAt: timestamp('last_hit_at'),
+  /** Free text — "imported from LiveNewAeonWebsite.Blogs.blg_Id". */
+  note: text('note'),
+  createdAt: timestamp('created_at').defaultNow(),
+}, (table) => ({
+  sourceIdx: uniqueIndex('redirects_source_idx').on(table.source),
+  activeIdx: index('redirects_active_idx').on(table.isActive),
 }));

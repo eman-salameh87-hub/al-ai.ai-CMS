@@ -1,6 +1,6 @@
 // app/(site)/[locale]/[segment]/[slug]/page.tsx
 import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
+import { redirectOrNotFound } from '@/lib/redirects/guard';
 import { db } from '@/lib/db';
 import { content, contentI18n, contentTypes } from '@/lib/db/schema';
 import { and, eq } from 'drizzle-orm';
@@ -10,6 +10,8 @@ import { typeByPrefix } from '@/lib/content/types-admin';
 import { buildMetadata } from '@/lib/seo/metadata';
 import { getSettings } from '@/lib/db/queries';
 import { locales, type Locale } from '@/lib/env';
+import { parseFieldDefinitions } from '@/lib/content/custom-fields';
+import { CustomFieldBanner, CustomFieldDetails } from '@/components/site/custom-fields';
 
 interface Params {
   params: Promise<{ locale: string; segment: string; slug: string }>;
@@ -43,6 +45,11 @@ async function load(localeParam: string, prefix: string, slug: string) {
       metaDescription: contentI18n.metaDescription,
       ogImage: contentI18n.ogImage,
       noIndex: contentI18n.noIndex,
+      // The entry's own field values, plus the definitions from its type, so
+      // the page can render them. Both come from the same query the page
+      // already runs.
+      customFieldValues: content.customFieldValues,
+      typeCustomFields: contentTypes.customFields,
     })
     .from(content)
     .innerJoin(contentTypes, eq(contentTypes.id, content.typeId))
@@ -83,17 +90,48 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 export default async function CustomTypeEntry({ params }: Params) {
   const { locale, segment, slug } = await params;
   const loaded = await load(locale, segment, slug);
-  if (!loaded) notFound();
+  // A recorded move wins over a 404. The rule in middleware has already had
+  // its go; this is the table, for the slugs no rule could predict.
+  /*
+   * `return await`, not a bare await.
+   *
+   * redirectOrNotFound is Promise<never> and always throws, but TypeScript
+   * only narrows `loaded` past this line if the branch RETURNS — an awaited
+   * never is not a control-flow assertion. Returning it is also honest: this
+   * function is finished either way.
+   */
+  if (!loaded) return await redirectOrNotFound(`/${locale}/${segment}/${slug}`);
 
   const { row } = loaded;
+  const definitions = parseFieldDefinitions(row.typeCustomFields);
 
   return (
     <article className="mx-auto max-w-4xl px-4 py-16" data-test-id="type-entry">
       <header className="mb-8">
-        <h1 className="text-3xl font-bold text-site-ink">{row.title ?? slug}</h1>
+        <h1 className="font-display text-3xl font-bold text-site-ink">{row.title ?? slug}</h1>
         {row.excerpt && <p className="mt-2 text-site-ink-muted">{row.excerpt}</p>}
       </header>
-      <ContentRenderer blocks={asContentBlocks(row.body)} locale={loaded.locale} />
+
+      {/* A field marked `banner` — the legacy inner-page image — above the
+          body, which is where the old template put it. */}
+      <CustomFieldBanner definitions={definitions} values={row.customFieldValues} />
+
+      <ContentRenderer
+        blocks={asContentBlocks(row.body)}
+        locale={loaded.locale}
+        // The full path, not just the slug: a submission from a client case
+        // study should be traceable to that entry, and `stc` alone is
+        // ambiguous across four catalogues.
+        pageSlug={`${segment}/${slug}`}
+      />
+
+      {/* Fields marked `inline` — the advanced services' video, and anything an
+          editor adds later — after the body. */}
+      <CustomFieldDetails
+        definitions={definitions}
+        values={row.customFieldValues}
+        locale={loaded.locale}
+      />
     </article>
   );
 }

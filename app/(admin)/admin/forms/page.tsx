@@ -7,6 +7,7 @@ import { verifyAccessToken } from '@/lib/auth/session';
 import { createTranslator } from '@/lib/admin-i18n';
 import { getAdminLocale } from '@/lib/admin-i18n/server';
 import { FormsManager, type SubmissionRow } from '@/components/admin/forms-manager';
+import { FORM_TYPES, type FormType } from '@/lib/forms/form-types';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,7 +20,17 @@ export default async function FormsPage({
   const locale = await getAdminLocale();
   const t = createTranslator(locale);
 
-  const type = params.type === 'newsletter' ? 'newsletter' : 'contact';
+  /*
+   * Four tabs now, not two.
+   *
+   * Validated against FORM_TYPES rather than a chain of ternaries: an
+   * unrecognised `?type=` falls back to the inbox instead of reaching a pgEnum
+   * comparison, which Postgres rejects with 22P02 as a 500.
+   */
+  const requested = params.type ?? '';
+  const type: FormType = (FORM_TYPES as readonly string[]).includes(requested)
+    ? (requested as FormType)
+    : 'contact';
   const showArchived = params.archived === '1';
 
   // Only an admin may delete outright; an editor archives instead.
@@ -31,13 +42,16 @@ export default async function FormsPage({
     canDelete = false;
   }
 
-  // Newsletter signups are a list, never a queue, so the archive filter only
-  // applies to messages.
+  /*
+   * Newsletter signups are a list, never a queue, so the archive filter only
+   * applies to the types that ARE a queue — messages and applications. An
+   * application is handled and then leaves the inbox, exactly like an enquiry.
+   */
   const where =
     type === 'newsletter'
       ? eq(formSubmissions.type, 'newsletter')
       : and(
-          eq(formSubmissions.type, 'contact'),
+          eq(formSubmissions.type, type),
           showArchived
             ? isNotNull(formSubmissions.archivedAt)
             : isNull(formSubmissions.archivedAt)
@@ -55,7 +69,10 @@ export default async function FormsPage({
       .from(formSubmissions)
       .where(
         and(
-          eq(formSubmissions.type, 'contact'),
+          // The badge counts unread on the CURRENT tab, so an unread job
+          // application is visible as one rather than being folded into the
+          // contact count.
+          eq(formSubmissions.type, type === 'newsletter' ? 'contact' : type),
           eq(formSubmissions.isRead, false),
           isNull(formSubmissions.archivedAt)
         )
@@ -67,6 +84,22 @@ export default async function FormsPage({
     id: r.id,
     type: r.type,
     payload: r.payload ?? {},
+    /*
+     * The storage key is stripped here, not in the component.
+     *
+     * `attachments` is a jsonb array of FormAttachment, whose `key` addresses
+     * the object in the bucket. This row crosses into a Client Component, so
+     * anything left on it ships to the browser — and the key is the one field
+     * that can delete an applicant's CV.
+     */
+    attachments:
+      r.attachments?.map((a) => ({
+        originalName: a.originalName,
+        url: a.url,
+        mimeType: a.mimeType,
+        size: a.size,
+        field: a.field,
+      })) ?? null,
     pageSlug: r.pageSlug,
     locale: r.locale,
     isRead: r.isRead ?? false,

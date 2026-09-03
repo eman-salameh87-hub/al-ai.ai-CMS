@@ -131,8 +131,143 @@ export type ContentBlock =
   | { type: 'contact-form'; fields: ('name' | 'email' | 'phone' | 'message' | 'subject')[]; submitLabel?: string; successMessage?: string }
   | { type: 'newsletter'; title: string; description?: string; buttonText?: string; privacyNote?: string }
   | { type: 'social-links'; platforms: ('facebook' | 'instagram' | 'twitter' | 'linkedin' | 'youtube' | 'tiktok')[]; style: 'icons' | 'buttons' | 'floating' }
-  | { type: 'recent-posts'; title: string; category?: string; count: number; layout: 'list' | 'grid' | 'carousel' }
+  /**
+   * A card row of recent entries.
+   *
+   * `contentType` was absent, and the block therefore queried EVERY published
+   * content row regardless of type — on a site with a client catalogue and a
+   * service catalogue it listed pages, clients, services and achievements
+   * together as though they were one feed. Defaults to `post`, which is the
+   * behaviour the name implies and what every existing use of it meant.
+   */
+  | {
+      type: 'recent-posts';
+      title: string;
+      /** `content_types.slug`. Defaults to `post`. */
+      contentType?: string;
+      /** Category slug to scope to. Was declared and never read. */
+      category?: string;
+      count: number;
+      layout: 'list' | 'grid' | 'carousel';
+    }
   | { type: 'product-grid'; productIds: string[]; layout: 'grid' | 'list' | 'carousel' }
+  /**
+   * Full-bleed autoplay video, with a skip button — the first thing the old
+   * new-aeon.com home page showed.
+   *
+   * Distinct from `video`, which is an embed in the reading flow with a poster
+   * and controls. This is a background: muted, looping by default, no chrome,
+   * sized to the viewport. Trying to serve both from one block meant one of
+   * them was always wrong.
+   *
+   * ACCESSIBILITY IS PART OF THE BLOCK, NOT A LAYER OVER IT.
+   * `poster` is required, because a visitor who has asked for reduced motion
+   * gets the still instead of the video, and so does anyone whose connection
+   * or browser will not play it. `skipLabel` exists because the legacy page had
+   * a skip button and removing it would make the site slower to use, not
+   * cleaner.
+   */
+  | {
+      type: 'video-hero';
+      /** Uploaded mp4/webm URL. */
+      src: string;
+      /** Shown before the video paints, and INSTEAD of it under reduced motion. */
+      poster: string;
+      /** Overlay words. Optional — the legacy hero had none. */
+      eyebrow?: string;
+      title?: string;
+      text?: string;
+      buttonText?: string;
+      buttonUrl?: string;
+      /** Lets a visitor jump past it. Falls back to a translated default. */
+      skipLabel?: string;
+      loop?: boolean;
+      height: 'viewport' | 'tall' | 'medium';
+    }
+  /**
+   * The client logo strip. A marquee of logos, each optionally linking to its
+   * case study.
+   *
+   * Not a `gallery`: a gallery is a set of pictures to look at, sized to their
+   * own aspect ratios. These are marks of varying shapes that must read as one
+   * row of equal-weight items, which needs its own containment and its own
+   * greyscale/colour treatment.
+   */
+  | {
+      type: 'logo-carousel';
+      title?: string;
+      logos: { src: string; alt: string; url?: string }[];
+      /** Pulls the logos from published entries of a content type instead. */
+      fromContentType?: string;
+      /** 0 disables the marquee and renders a static, wrapping grid. */
+      speedSeconds: number;
+      grayscale?: boolean;
+    }
+  /**
+   * Posts with client-side category filtering — the legacy home page's blog
+   * strip, where the category buttons swapped the list without a page load.
+   *
+   * Separate from `recent-posts`, which is a fixed list optionally scoped to one
+   * category. The filtering is the feature here, and it changes what the block
+   * has to fetch: every category with published posts, plus the posts, rather
+   * than one query for N posts.
+   */
+  | {
+      type: 'blog-strip';
+      title?: string;
+      /** How many posts to show per category view. */
+      count: number;
+      /** Category slugs offered as filters. Empty means every category in use. */
+      categories?: string[];
+      layout: 'grid' | 'carousel';
+      showAllLabel?: string;
+    }
+  /**
+   * The Portfolio page's two-axis filter: category AND country together.
+   *
+   * The migration assessment calls this out as a BUILD item, and the reason is
+   * structural — the CMS has one hierarchical category tree plus flat tags, so
+   * country lives in tags, and the shared archive template renders no filter
+   * controls at all. This block is both the controls and the query.
+   *
+   * `contentType` rather than a hardcoded "client", so the same block serves
+   * any catalogue that grows two axes later.
+   */
+  | {
+      type: 'client-filter';
+      /** `content_types.slug` whose entries are filtered. */
+      contentType: string;
+      title?: string;
+      text?: string;
+      /** Labels for the two filter groups, per locale, set by the editor. */
+      categoryLabel?: string;
+      countryLabel?: string;
+      /** Grid density. */
+      columns: 3 | 4 | 5;
+      /** Entries per page. The legacy page showed all 95 at once. */
+      pageSize: number;
+    }
+  /**
+   * A job or training application, including its attachment.
+   *
+   * Deliberately NOT a variant of `contact-form`. It writes a different form
+   * type, it accepts a file, and its fields are fixed rather than
+   * author-configurable — an application whose CV field an editor can
+   * accidentally remove is a form that silently stops working.
+   */
+  | {
+      type: 'application-form';
+      /** Decides the submission's form type and which fields render. */
+      kind: 'career' | 'training';
+      title?: string;
+      text?: string;
+      /** Offer a choice of open role or course, from that content type. */
+      positionsFrom?: string;
+      submitLabel?: string;
+      successMessage?: string;
+      /** Whether the attachment is compulsory. A CV usually is. */
+      attachmentRequired?: boolean;
+    }
   | { type: 'custom'; component: string; props: Record<string, unknown> };
 
 /** Narrowing helper so BlockRenderer stays free of `any` casts. */

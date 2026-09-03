@@ -7,6 +7,10 @@ import { MediaField } from './media-field';
 import {
   TableEditor, PricingEditor, ComparisonEditor, ProductGridEditor, CustomEditor,
 } from './blocks/grid-editors';
+import {
+  VideoHeroEditor, LogoCarouselEditor, BlogStripEditor, ClientFilterEditor,
+  ApplicationFormEditor,
+} from './blocks/legacy-editors';
 import { BLOCK_LABEL_KEYS, isSafeUrl } from '@/lib/blocks/defaults';
 import { sliderLimits } from '@/lib/blocks/slider';
 import { youTubeId } from '@/lib/blocks/youtube';
@@ -777,6 +781,23 @@ export function BlockEditor({ block, onChange }: BlockEditorProps) {
       return (
         <div className="space-y-3">
           <MiniField label={t('be.title')} value={block.title} onChange={(v) => onChange({ ...block, title: v })} />
+          {/*
+            Which type to list. Blank means posts, which is what this block
+            did exclusively before — and what its name implies.
+          */}
+          <MiniField
+            label={t('be.contentTypeKey')}
+            value={block.contentType ?? ''}
+            ltr
+            placeholder="post"
+            onChange={(v) => onChange({ ...block, contentType: v.trim() || undefined })}
+          />
+          <MiniField
+            label={t('be.categorySlug')}
+            value={block.category ?? ''}
+            ltr
+            onChange={(v) => onChange({ ...block, category: v.trim() || undefined })}
+          />
           <div className="grid gap-3 sm:grid-cols-2">
             <MiniField label={t('be.count')} type="number" ltr value={block.count}
               onChange={(v) => onChange({ ...block, count: Math.max(1, Math.min(12, Number(v) || 1)) })} />
@@ -845,6 +866,24 @@ export function BlockEditor({ block, onChange }: BlockEditorProps) {
 
     case 'custom':
       return <CustomEditor block={block} onChange={onChange} />;
+
+    // The five blocks added for the new-aeon.com rebuild. Bodies live in
+    // blocks/legacy-editors.tsx; the case labels stay here because this switch
+    // is the single dispatch point tests/block-editors-coverage.test.ts reads.
+    case 'video-hero':
+      return <VideoHeroEditor block={block} onChange={onChange} />;
+
+    case 'logo-carousel':
+      return <LogoCarouselEditor block={block} onChange={onChange} />;
+
+    case 'blog-strip':
+      return <BlogStripEditor block={block} onChange={onChange} />;
+
+    case 'client-filter':
+      return <ClientFilterEditor block={block} onChange={onChange} />;
+
+    case 'application-form':
+      return <ApplicationFormEditor block={block} onChange={onChange} />;
 
     case 'testimonial':
 

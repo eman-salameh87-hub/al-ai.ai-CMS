@@ -284,6 +284,116 @@ export const ENTITIES: readonly EntityDef[] = [
     }),
   },
 
+  /**
+   * Content — pages, posts, and every custom type's entries.
+   *
+   * The registry defined seven entities and NONE of them was content, which
+   * meant the 96 client case studies, ten services, six advanced services, the
+   * achievements and the whole blog had no bulk route in or out. That is the
+   * gap this closes.
+   *
+   * THE KEY IS COMPOUND, AND HAS TO BE.
+   * `content.slug` is not unique on its own — it is indexed, not constrained,
+   * and two different types can legitimately both have a `stc` entry. Matching
+   * on slug alone would have a spreadsheet row for a client silently overwrite
+   * a page. `type|slug` is the real identity.
+   *
+   * BODIES TRAVEL AS HTML.
+   * A spreadsheet cell cannot hold a block array, and nobody can edit
+   * `[{"type":"rich-text",…}]` in Excel. Bodies export through
+   * lib/blocks/to-html.ts and import back through lib/blocks/from-html.ts —
+   * the same converter that brought the legacy content in. Blocks with no HTML
+   * form (a slider, a filter, a form) export as a comment naming them, and the
+   * importer leaves those bodies alone rather than flattening them.
+   */
+  {
+    id: 'content',
+    labelEn: 'Content',
+    labelAr: 'المحتوى',
+    naturalKey: 'type|slug',
+    columns: [
+      {
+        key: 'type',
+        labelEn: 'Type',
+        labelAr: 'النوع',
+        required: true,
+        example: 'client',
+        hintEn: "The content type's key, e.g. page, post, client, service.",
+      },
+      { key: 'slug', labelEn: 'Slug', labelAr: 'الرابط', required: true, example: 'stc' },
+      {
+        key: 'status',
+        labelEn: 'Status',
+        labelAr: 'الحالة',
+        example: 'published',
+        hintEn: 'draft, published or archived. Blank leaves an existing entry unchanged.',
+      },
+      { key: 'title_en', labelEn: 'Title (EN)', labelAr: 'العنوان (إنجليزي)', example: 'STC' },
+      { key: 'title_ar', labelEn: 'Title (AR)', labelAr: 'العنوان (عربي)', example: 'إس تي سي' },
+      { key: 'excerpt_en', labelEn: 'Excerpt (EN)', labelAr: 'المقدمة (إنجليزي)', example: '' },
+      { key: 'excerpt_ar', labelEn: 'Excerpt (AR)', labelAr: 'المقدمة (عربي)', example: '' },
+      {
+        key: 'body_en',
+        labelEn: 'Body (EN)',
+        labelAr: 'المحتوى (إنجليزي)',
+        example: '<p>Case study text.</p>',
+        hintEn: 'HTML. Headings, paragraphs, lists, links, images and tables are converted to blocks.',
+      },
+      { key: 'body_ar', labelEn: 'Body (AR)', labelAr: 'المحتوى (عربي)', example: '' },
+      { key: 'featured_image', labelEn: 'Featured image URL', labelAr: 'رابط الصورة', example: '' },
+      { key: 'meta_title_en', labelEn: 'Meta title (EN)', labelAr: 'عنوان SEO (إنجليزي)', example: '' },
+      { key: 'meta_title_ar', labelEn: 'Meta title (AR)', labelAr: 'عنوان SEO (عربي)', example: '' },
+      { key: 'meta_description_en', labelEn: 'Meta description (EN)', labelAr: 'وصف SEO (إنجليزي)', example: '' },
+      { key: 'meta_description_ar', labelEn: 'Meta description (AR)', labelAr: 'وصف SEO (عربي)', example: '' },
+      {
+        key: 'categories',
+        labelEn: 'Category slugs',
+        labelAr: 'التصنيفات',
+        example: 'telecoms',
+        hintEn: 'Comma separated. Unknown slugs are reported, never created silently.',
+      },
+      {
+        key: 'tags',
+        labelEn: 'Tag slugs',
+        labelAr: 'الوسوم',
+        example: 'saudi-arabia',
+        hintEn: 'Comma separated. On the client catalogue these are countries.',
+      },
+      {
+        key: 'custom_fields',
+        labelEn: 'Custom fields (JSON)',
+        labelAr: 'حقول مخصصة (JSON)',
+        example: '{"videoLink":"https://youtu.be/x"}',
+        hintEn: 'A JSON object. Validated against the type\'s own field definitions.',
+      },
+    ],
+    rowSchema: z.object({
+      type: text().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'lowercase letters, numbers and dashes'),
+      slug: text().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'lowercase letters, numbers and dashes'),
+      status: z
+        .enum(['draft', 'published', 'archived'])
+        .optional()
+        .or(z.literal('')),
+      title_en: optionalText(),
+      title_ar: optionalText(),
+      excerpt_en: optionalText(1000),
+      excerpt_ar: optionalText(1000),
+      // Generous: a case study body is prose, and the legacy corpus tops out
+      // around 2.5 KB per locale. 100 KB is room to grow without being a way
+      // to post a megabyte into a cell.
+      body_en: optionalText(100_000),
+      body_ar: optionalText(100_000),
+      featured_image: optionalText(2048),
+      meta_title_en: optionalText(),
+      meta_title_ar: optionalText(),
+      meta_description_en: optionalText(500),
+      meta_description_ar: optionalText(500),
+      categories: optionalText(1000),
+      tags: optionalText(1000),
+      custom_fields: optionalText(4000),
+    }),
+  },
+
   {
     id: 'customers',
     labelEn: 'Customers',

@@ -19,6 +19,21 @@ export interface StorageDriver {
   put(key: string, body: Buffer, contentType: string): Promise<string>;
 
   /**
+   * Reads back the object at `key`, or null when it is not there.
+   *
+   * Needed because not every stored file is public. Media-library uploads are
+   * served straight off their URL, but a form attachment — an applicant's CV —
+   * is deliberately stored where nothing links to it and handed out only
+   * through an authenticated route, which has to be able to fetch the bytes
+   * itself. See app/api/forms/[id]/attachments/[index]/route.ts.
+   *
+   * Returns null rather than throwing when the object is missing: a row can
+   * outlive its file (a restored database, a storage sweep, a driver switch),
+   * and that is a 404, not a server error.
+   */
+  get(key: string): Promise<{ body: Buffer; contentType?: string } | null>;
+
+  /**
    * Removes the object addressed by a URL this driver produced.
    * Must resolve rather than throw when the object is already gone: the caller
    * is deleting a database row and that outcome is still correct.

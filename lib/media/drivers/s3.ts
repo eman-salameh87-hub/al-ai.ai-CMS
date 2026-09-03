@@ -102,6 +102,32 @@ export const s3Driver: StorageDriver = {
     return `${cfg.publicUrl}/${key}`;
   },
 
+  async get(key) {
+    const cfg = readConfig();
+    const client = await getClient();
+    const { GetObjectCommand } = await import('@aws-sdk/client-s3');
+
+    try {
+      const response = await client.send(
+        new GetObjectCommand({ Bucket: cfg.bucket, Key: key })
+      );
+      if (!response.Body) return null;
+
+      // transformToByteArray is on the SDK v3 stream mixin and buffers the
+      // whole object. Correct here: attachments are capped at 5 MB, and the
+      // caller needs a Content-Length to force a download.
+      const bytes = await response.Body.transformToByteArray();
+      return {
+        body: Buffer.from(bytes),
+        contentType: response.ContentType,
+      };
+    } catch {
+      // NoSuchKey and a network failure are the same answer to the caller: it
+      // cannot serve the file, and that is a 404 rather than a 500.
+      return null;
+    }
+  },
+
   async remove(url) {
     if (!this.owns(url)) return;
 

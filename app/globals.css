@@ -349,3 +349,80 @@
 @layer utilities {
   .text-balance { text-wrap: balance; }
 }
+
+/* ─── NEW AEON LOOK AND FEEL ──────────────────────────────
+ *
+ * The handful of things the legacy new-aeon.com theme did that Tailwind
+ * utilities cannot express: a marquee keyframe, and the heading/body pairing.
+ *
+ * Everything else — colour, spacing, radius — goes through the theme slots in
+ * lib/theme/slots.ts, so the client can change it in Settings rather than
+ * needing a deploy. Only genuinely structural CSS belongs here.
+ */
+@layer base {
+  /*
+   * Bitter for headings, Lato/Cairo for copy — the legacy pairing.
+   *
+   * Scoped to .site-body so the admin panel is untouched: it has its own
+   * type scale, and a serif admin heading would be a regression nobody asked
+   * for.
+   */
+  .site-body :is(h1, h2, h3, h4, h5, h6) {
+    font-family: var(--font-display), var(--font-cairo), Georgia, serif;
+    font-weight: 700;
+  }
+
+  .site-body {
+    font-family: var(--font-body), var(--font-cairo), system-ui, sans-serif;
+  }
+
+  /* Arabic has no Bitter glyphs; Cairo leads the stack instead of trailing it. */
+  .site-body[dir='rtl'] :is(h1, h2, h3, h4, h5, h6),
+  [dir='rtl'] .site-body :is(h1, h2, h3, h4, h5, h6) {
+    font-family: var(--font-cairo), system-ui, sans-serif;
+  }
+}
+
+@layer components {
+  /*
+   * The client logo marquee. See components/site/blocks/logo-carousel.tsx.
+   *
+   * -50% exactly, because the component renders the track twice: at the end of
+   * the cycle the second copy sits precisely where the first started, so the
+   * reset is invisible. Any other distance shows a jump.
+   */
+  @keyframes logo-marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  .logo-marquee {
+    animation: logo-marquee var(--marquee-duration, 40s) linear infinite;
+  }
+
+  /* Stops while someone is trying to read or click a logo. */
+  .group:hover .logo-marquee,
+  .logo-marquee:hover {
+    animation-play-state: paused;
+  }
+
+  /*
+   * A continuously moving element is a real accessibility problem — it can
+   * trigger nausea, and it makes text impossible to read for anyone who needs
+   * time. Under this preference the track simply stops; the logos are all
+   * still in the DOM and the row is horizontally scrollable, so nothing is
+   * lost.
+   */
+  @media (prefers-reduced-motion: reduce) {
+    .logo-marquee {
+      animation: none;
+      flex-wrap: wrap;
+      width: 100%;
+      justify-content: center;
+    }
+  }
+}

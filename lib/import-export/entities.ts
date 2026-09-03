@@ -19,7 +19,16 @@ import {
   products,
   tagI18n,
   tags,
+  content,
+  contentI18n,
+  contentTypes,
+  contentCategories,
+  contentTags,
 } from '@/lib/db/schema';
+import { blocksToHtml, hasUnexportableBlocks } from '@/lib/blocks/to-html';
+import { blocksFromHtml } from '@/lib/blocks/from-html';
+import { parseFieldDefinitions, validateFieldValues } from '@/lib/content/custom-fields';
+import { asContentBlocks } from '@/lib/blocks/content-schema';
 import { getSettings } from '@/lib/db/queries';
 import { minorUnitExponent } from '@/lib/money';
 import { normalisePhone } from '@/lib/commerce/phone';
@@ -238,6 +247,80 @@ async function exportRows(entity: EntityDef): Promise<Record<string, string>[]> 
         }));
     }
 
+    case 'content': {
+      const rows = await db
+        .select({
+          id: content.id,
+          slug: content.slug,
+          status: content.status,
+          featuredImage: content.featuredImage,
+          customFieldValues: content.customFieldValues,
+          typeSlug: contentTypes.slug,
+        })
+        .from(content)
+        .innerJoin(contentTypes, eq(contentTypes.id, content.typeId))
+        .orderBy(asc(contentTypes.slug), asc(content.slug));
+
+      if (!rows.length) return [];
+
+      const ids = rows.map((row) => row.id);
+
+      // Three flat queries stitched in memory, rather than a join that would
+      // multiply each entry by its translations times its categories times its
+      // tags and need de-duplicating afterwards.
+      const [translations, categoryLinks, tagLinks] = await Promise.all([
+        db.select().from(contentI18n).where(inArray(contentI18n.contentId, ids)),
+        db
+          .select({ contentId: contentCategories.contentId, slug: categories.slug })
+          .from(contentCategories)
+          .innerJoin(categories, eq(categories.id, contentCategories.categoryId))
+          .where(inArray(contentCategories.contentId, ids)),
+        db
+          .select({ contentId: contentTags.contentId, slug: tags.slug })
+          .from(contentTags)
+          .innerJoin(tags, eq(tags.id, contentTags.tagId))
+          .where(inArray(contentTags.contentId, ids)),
+      ]);
+
+      const i18nOf = new Map(translations.map((t) => [`${t.contentId}|${t.locale}`, t]));
+      const groupBy = (links: { contentId: string; slug: string }[]) => {
+        const map = new Map<string, string[]>();
+        for (const link of links) {
+          const list = map.get(link.contentId);
+          if (list) list.push(link.slug);
+          else map.set(link.contentId, [link.slug]);
+        }
+        return map;
+      };
+      const categoriesOf = groupBy(categoryLinks);
+      const tagsOf = groupBy(tagLinks);
+
+      return rows.map((row) => {
+        const en = i18nOf.get(`${row.id}|en`);
+        const ar = i18nOf.get(`${row.id}|ar`);
+
+        return {
+          type: row.typeSlug,
+          slug: row.slug,
+          status: row.status ?? 'draft',
+          title_en: en?.title ?? '',
+          title_ar: ar?.title ?? '',
+          excerpt_en: en?.excerpt ?? '',
+          excerpt_ar: ar?.excerpt ?? '',
+          body_en: blocksToHtml(asContentBlocks(en?.body)),
+          body_ar: blocksToHtml(asContentBlocks(ar?.body)),
+          featured_image: row.featuredImage ?? '',
+          meta_title_en: en?.metaTitle ?? '',
+          meta_title_ar: ar?.metaTitle ?? '',
+          meta_description_en: en?.metaDescription ?? '',
+          meta_description_ar: ar?.metaDescription ?? '',
+          categories: (categoriesOf.get(row.id) ?? []).join(', '),
+          tags: (tagsOf.get(row.id) ?? []).join(', '),
+          custom_fields: row.customFieldValues ? JSON.stringify(row.customFieldValues) : '',
+        };
+      });
+    }
+
     case 'customers': {
       const exponent = await currencyExponent();
       const rows = await db
@@ -333,6 +416,8 @@ async function upsert(entity: EntityDef, row: Record<string, string>): Promise<b
       return upsertTag(row);
     case 'reviews':
       return upsertReview(row);
+    case 'content':
+      return upsertContent(row);
     default:
       throw new Error(`${entity.id} cannot be imported`);
   }
@@ -701,4 +786,273 @@ async function lookupId(
     .where(eq(column, slug.trim()))
     .limit(1);
   return found?.id ?? null;
+}
+
+/**
+ * Create or update one content entry from a spreadsheet row.
+ *
+ * Matched on (type, slug), because `content.slug` is indexed rather than
+ * unique and two types can legitimately share one. Matching on slug alone
+ * would let a row for a client overwrite a page.
+ */
+async function upsertContent(row: Record<string, string>): Promise<boolean> {
+  const typeSlug = (row.type ?? '').trim();
+  const slug = (row.slug ?? '').trim();
+  if (!typeSlug || !slug) throw new Error('type and slug are both required');
+
+  const [type] = await db
+    .select({ id: contentTypes.id, customFields: contentTypes.customFields })
+    .from(contentTypes)
+    .where(eq(contentTypes.slug, typeSlug))
+    .limit(1);
+
+  // Refused, not created. Inventing a content type from a typo in a
+  // spreadsheet would give it no route prefix, no field definitions and no
+  // screens — a type with rows and nowhere to live, which is exactly the
+  // problem `routePrefix` exists to prevent.
+  if (!type) throw new Error(`unknown content type "${typeSlug}"`);
+
+  const [existing] = await db
+    .select({ id: content.id })
+    .from(content)
+    .where(and(eq(content.typeId, type.id), eq(content.slug, slug)))
+    .limit(1);
+
+  /*
+   * Custom fields, through the same validator the API and the importer use.
+   *
+   * A malformed JSON cell fails the row rather than being ignored: the person
+   * meant to set something, and silently dropping it is how a "successful"
+   * import turns out to have done nothing.
+   */
+  let fieldValues: Record<string, unknown> | undefined;
+  if (row.custom_fields?.trim()) {
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(row.custom_fields);
+    } catch {
+      throw new Error('custom_fields is not valid JSON');
+    }
+    const definitions = parseFieldDefinitions(type.customFields);
+    const checked = validateFieldValues(definitions, parsed);
+    if (!checked.ok) {
+      throw new Error(
+        `custom_fields: ${Object.entries(checked.errors)
+          .map(([key, message]) => `${key} — ${message}`)
+          .join('; ')}`
+      );
+    }
+    fieldValues = checked.values;
+  }
+
+  const status = (row.status ?? '').trim() as 'draft' | 'published' | 'archived' | '';
+
+  let contentId: string;
+  let created = false;
+
+  if (existing) {
+    contentId = existing.id;
+    await db
+      .update(content)
+      .set({
+        // A blank cell means "leave it alone". Coercing it to 'draft' would
+        // unpublish every entry in a file where someone cleared the column.
+        ...(status ? { status } : {}),
+        ...(row.featured_image?.trim() ? { featuredImage: row.featured_image.trim() } : {}),
+        ...(fieldValues ? { customFieldValues: fieldValues } : {}),
+        updatedAt: new Date(),
+      })
+      .where(eq(content.id, contentId));
+  } else {
+    const [inserted] = await db
+      .insert(content)
+      .values({
+        typeId: type.id,
+        slug,
+        // A new entry with no status named is a DRAFT. An import must not
+        // publish something nobody has looked at.
+        status: status || 'draft',
+        featuredImage: row.featured_image?.trim() || null,
+        customFieldValues: fieldValues ?? null,
+        publishedAt: status === 'published' ? new Date() : null,
+      })
+      .returning({ id: content.id });
+    contentId = inserted!.id;
+    created = true;
+  }
+
+  for (const locale of ['en', 'ar'] as const) {
+    const title = (row[`title_${locale}`] ?? '').trim();
+    const bodyHtml = (row[`body_${locale}`] ?? '').trim();
+    const excerpt = (row[`excerpt_${locale}`] ?? '').trim();
+    const metaTitle = (row[`meta_title_${locale}`] ?? '').trim();
+    const metaDescription = (row[`meta_description_${locale}`] ?? '').trim();
+
+    // Nothing supplied for this locale: leave whatever is there. A file that
+    // only fills in English must not blank the Arabic translation.
+    if (!title && !bodyHtml && !excerpt && !metaTitle && !metaDescription) continue;
+
+    const [current] = await db
+      .select({ title: contentI18n.title, body: contentI18n.body })
+      .from(contentI18n)
+      .where(and(eq(contentI18n.contentId, contentId), eq(contentI18n.locale, locale)))
+      .limit(1);
+
+    /*
+     * A body that HTML cannot represent is NOT overwritten.
+     *
+     * Blocks like a slider or an application form export as a comment, so a
+     * round trip would come back as an empty body and destroy the page. The
+     * row still updates its title, excerpt and SEO — only the body is held
+     * back, and the failure is loud rather than silent.
+     */
+    let body = current?.body ?? null;
+    if (bodyHtml) {
+      if (hasUnexportableBlocks(asContentBlocks(current?.body))) {
+        throw new Error(
+          `${locale} body contains blocks that cannot round-trip through HTML ` +
+          '(a slider, form or filter) — edit this entry in the CMS instead'
+        );
+      }
+      body = blocksFromHtml(bodyHtml, {
+        // Image sources are taken as written. The spreadsheet author is staff,
+        // and the URLs they paste are the ones they mean — unlike the legacy
+        // import, where three different broken roots had to be rewritten.
+        resolveImageSrc: (src) => src,
+      });
+    }
+
+    const resolvedTitle = title || current?.title;
+    if (!resolvedTitle) {
+      // contentI18n.title is NOT NULL, so a new translation must have one.
+      throw new Error(`title_${locale} is required to create the ${locale} translation`);
+    }
+
+    await db
+      .insert(contentI18n)
+      .values({
+        contentId,
+        locale,
+        title: resolvedTitle,
+        excerpt: excerpt || null,
+        body,
+        metaTitle: metaTitle || null,
+        metaDescription: metaDescription || null,
+      })
+      .onConflictDoUpdate({
+        target: [contentI18n.contentId, contentI18n.locale],
+        set: {
+          title: resolvedTitle,
+          ...(excerpt ? { excerpt } : {}),
+          ...(bodyHtml ? { body } : {}),
+          ...(metaTitle ? { metaTitle } : {}),
+          ...(metaDescription ? { metaDescription } : {}),
+        },
+      });
+  }
+
+  await linkTaxonomy(contentId, row.categories, row.tags);
+  return created;
+}
+
+/**
+ * Attach categories and tags by slug.
+ *
+ * An unknown slug FAILS the row rather than being created. A category invented
+ * from a typo would appear in the site's navigation and in every filter, and
+ * nobody would know where it came from — the opposite of what a bulk import
+ * should be allowed to do quietly.
+ *
+ * A blank cell leaves existing links alone; an explicit `-` clears them, which
+ * is the only way a spreadsheet can express "remove all".
+ */
+async function linkTaxonomy(
+  contentId: string,
+  categoryCell: string | undefined,
+  tagCell: string | undefined
+): Promise<void> {
+  await linkOne(contentId, categoryCell, 'category');
+  await linkOne(contentId, tagCell, 'tag');
+}
+
+/**
+ * One axis of taxonomy.
+ *
+ * Written as two explicit branches rather than a loop over a table/column
+ * tuple: drizzle's insert values are typed per table, and threading them
+ * through one generic call needed a cast that would have hidden a real mistake
+ * — inserting a category id into content_tags type-checks fine when the types
+ * are erased.
+ */
+async function linkOne(
+  contentId: string,
+  cell: string | undefined,
+  kind: 'category' | 'tag'
+): Promise<void> {
+  const raw = (cell ?? '').trim();
+  // Blank leaves existing links alone. A file that does not mention categories
+  // must not strip them from every row.
+  if (!raw) return;
+
+  // `-` is the only way a spreadsheet can say "remove all".
+  const slugs =
+    raw === '-'
+      ? []
+      : raw
+          .split(',')
+          .map((value) => value.trim().toLowerCase())
+          .filter(Boolean);
+
+  if (kind === 'category') {
+    const ids = slugs.length ? await resolveCategoryIds(slugs) : [];
+    await db.delete(contentCategories).where(eq(contentCategories.contentId, contentId));
+    if (ids.length) {
+      await db
+        .insert(contentCategories)
+        .values(ids.map((categoryId) => ({ contentId, categoryId })))
+        .onConflictDoNothing();
+    }
+    return;
+  }
+
+  const ids = slugs.length ? await resolveTagIds(slugs) : [];
+  await db.delete(contentTags).where(eq(contentTags.contentId, contentId));
+  if (ids.length) {
+    await db
+      .insert(contentTags)
+      .values(ids.map((tagId) => ({ contentId, tagId })))
+      .onConflictDoNothing();
+  }
+}
+
+/**
+ * Slugs to ids, failing on the first unknown one.
+ *
+ * An unknown slug is NOT created. A category invented from a typo would appear
+ * in the site navigation and in every filter control, and nobody would know
+ * where it came from — which is not something a bulk import should be able to
+ * do quietly.
+ */
+async function resolveCategoryIds(slugs: string[]): Promise<string[]> {
+  const found = await db
+    .select({ id: categories.id, slug: categories.slug })
+    .from(categories)
+    .where(inArray(categories.slug, slugs));
+
+  const bySlug = new Map(found.map((row) => [row.slug.toLowerCase(), row.id]));
+  const missing = slugs.filter((slug) => !bySlug.has(slug));
+  if (missing.length) throw new Error(`unknown category: ${missing.join(', ')}`);
+  return slugs.map((slug) => bySlug.get(slug)!);
+}
+
+async function resolveTagIds(slugs: string[]): Promise<string[]> {
+  const found = await db
+    .select({ id: tags.id, slug: tags.slug })
+    .from(tags)
+    .where(inArray(tags.slug, slugs));
+
+  const bySlug = new Map(found.map((row) => [row.slug.toLowerCase(), row.id]));
+  const missing = slugs.filter((slug) => !bySlug.has(slug));
+  if (missing.length) throw new Error(`unknown tag: ${missing.join(', ')}`);
+  return slugs.map((slug) => bySlug.get(slug)!);
 }

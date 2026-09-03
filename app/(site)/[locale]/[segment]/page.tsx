@@ -75,7 +75,11 @@ export default async function ContentPage({ params }: Params) {
         {i18n?.excerpt && <p className="mt-2 text-lg text-site-ink-muted">{i18n.excerpt}</p>}
       </header>
 
-      <ContentRenderer blocks={asContentBlocks(i18n?.body)} locale={loaded.locale} />
+      <ContentRenderer
+        blocks={asContentBlocks(i18n?.body)}
+        locale={loaded.locale}
+        pageSlug={segment}
+      />
     </article>
   );
 }

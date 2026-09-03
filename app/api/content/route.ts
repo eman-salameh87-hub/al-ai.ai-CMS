@@ -10,13 +10,25 @@ import {
 } from '@/lib/content/permissions';
 import type { ContentBlock } from '@/lib/blocks/types';
 import { setContentTaxonomy } from '@/lib/content/taxonomy';
-import { CONTENT_TYPE_SLUGS } from '@/lib/content/content-types';
+import { parseFieldDefinitions, validateFieldValues } from '@/lib/content/custom-fields';
 
 const createContentSchema = z.object({
-  // Derived from CONTENT_TYPE_SLUGS: this was the fourth hand-written copy of
-  // the same union, and it is the one that would have rejected a valid
-  // resource at the API while every screen happily offered it.
-  type: z.enum(CONTENT_TYPE_SLUGS),
+  /**
+   * Any content type's slug, not just the three built-in ones.
+   *
+   * This was `z.enum(CONTENT_TYPE_SLUGS)` — page, post, resource — which meant
+   * the API could not create an entry of a type an administrator had defined.
+   * The whole point of `content_types.routePrefix` is that a custom type gets
+   * real URLs, and this route refusing to write one made the feature
+   * unreachable from anywhere but a hand-written SQL insert. It is also what
+   * blocked bulk import: 95 client case studies have no built-in type to be.
+   *
+   * Nothing is loosened by this. The slug is looked up in `content_types`
+   * below and a miss is still a 400 — the database was always the real
+   * authority on which types exist, and the enum was a second, staler copy
+   * of it.
+   */
+  type: z.string().trim().min(1).max(255),
   slug: z.string().trim().min(1).max(255),
   status: z.enum(['draft', 'published', 'archived']),
   authorId: z.string().uuid().optional(),
@@ -40,6 +52,12 @@ const createContentSchema = z.object({
     .min(1),
   categoryIds: z.array(z.string().uuid()).max(20).optional(),
   tagIds: z.array(z.string().uuid()).max(50).optional(),
+  /**
+   * Values for the fields this content type declares. Shape is checked against
+   * the type's own definitions once it has been loaded — zod cannot validate
+   * these without knowing which type they belong to.
+   */
+  customFieldValues: z.record(z.unknown()).optional(),
 });
 
 export async function POST(request: Request) {
@@ -74,6 +92,22 @@ export async function POST(request: Request) {
       );
     }
 
+    /*
+     * Custom field values, checked against THIS type's definitions.
+     *
+     * validateFieldValues returns only the keys the type declares, so an API
+     * caller cannot use this jsonb column as free storage — without that
+     * filtering the column rots into a junk drawer within a release.
+     */
+    const definitions = parseFieldDefinitions(foundType.customFields);
+    const fields = validateFieldValues(definitions, validated.customFieldValues ?? {});
+    if (!fields.ok) {
+      return NextResponse.json(
+        { success: false, error: { message: 'Validation failed', fields: fields.errors } },
+        { status: 400 }
+      );
+    }
+
     const [newContent] = await db
       .insert(content)
       .values({
@@ -83,6 +117,9 @@ export async function POST(request: Request) {
         // optional body field, so anyone could credit a colleague.
         authorId: resolveAuthorId(auth.user.role, validated.authorId, auth.user.sub),
         featuredImage: validated.featuredImage,
+        // Only written when the type declares fields, so a page keeps a null
+        // column rather than an empty object.
+        customFieldValues: definitions.length ? fields.values : null,
         status: validated.status,
         publishedAt: validated.status === 'published' ? new Date() : null,
       })

@@ -1,7 +1,7 @@
 // app/(site)/[locale]/[segment]/type-archive.tsx
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { redirectOrNotFound } from '@/lib/redirects/guard';
 import { db } from '@/lib/db';
 import { content, contentI18n, contentTypes } from '@/lib/db/schema';
 import { and, desc, eq } from 'drizzle-orm';
@@ -50,7 +50,17 @@ export async function archiveMetadata(locale: string, prefix: string): Promise<M
 
 export async function TypeArchive({ locale, prefix }: { locale: string; prefix: string }) {
   const loaded = await load(locale, prefix);
-  if (!loaded) notFound();
+  // Same as the detail route: check the redirect table before giving up on
+  // this address.
+  /*
+   * `return await`, not a bare await.
+   *
+   * redirectOrNotFound is Promise<never> and always throws, but TypeScript
+   * only narrows `loaded` past this line if the branch RETURNS — an awaited
+   * never is not a control-flow assertion. Returning it is also honest: this
+   * function is finished either way.
+   */
+  if (!loaded) return await redirectOrNotFound(`/${locale}/${prefix}`);
 
   const { type, entries } = loaded;
   const ar = loaded.locale === 'ar';

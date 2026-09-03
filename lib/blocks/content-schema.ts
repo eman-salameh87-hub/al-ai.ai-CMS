@@ -68,6 +68,13 @@ export const contentPayloadSchema = z.object({
   translations: z.array(translationSchema).min(1),
   categoryIds: z.array(z.string().uuid()).max(20).optional(),
   tagIds: z.array(z.string().uuid()).max(50).optional(),
+  /**
+   * Values for the fields this entry's content type declares. Left as an open
+   * record here on purpose — which keys are legal, and what each may hold,
+   * depends on the type, which this schema has no access to. The write route
+   * checks it against the type's own definitions via validateFieldValues.
+   */
+  customFieldValues: z.record(z.unknown()).optional(),
 });
 
 export type ContentPayload = z.infer<typeof contentPayloadSchema>;

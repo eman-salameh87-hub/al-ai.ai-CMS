@@ -2,6 +2,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { verifyAccessToken } from '@/lib/auth/session';
+import { mapLegacyPath } from '@/lib/redirects/legacy-map';
 import { jwtVerify } from 'jose';
 
 // Read directly from process.env, not lib/env — middleware runs on the Edge
@@ -138,6 +139,36 @@ export async function middleware(request: NextRequest) {
     } catch {
       return toRefreshOrLogin();
     }
+  }
+
+  /*
+   * Legacy addresses, BEFORE locale routing.
+   *
+   * Order matters. `/WhoWeAre` has no locale prefix, so locale routing would
+   * bounce it to `/ar/WhoWeAre` first and this rule would then fire on the
+   * second request — two redirects where one will do, and two chances for a
+   * crawler to give up. Mapping first, and supplying the default locale here
+   * rather than leaving it to the redirect below, gets `/WhoWeAre` to
+   * `/ar/who-we-are` in a single hop.
+   *
+   * Every one of the 241 indexed URLs is handled here, on the Edge, with no
+   * database. Moves a rule cannot express are looked up in Node — see
+   * lib/redirects/resolve.ts.
+   */
+  const legacy = mapLegacyPath(pathname);
+  if (legacy) {
+    const url = request.nextUrl.clone();
+    const alreadyLocalised = LOCALES.some(
+      (locale) =>
+        legacy.destination === `/${locale}` || legacy.destination.startsWith(`/${locale}/`)
+    );
+    url.pathname = alreadyLocalised
+      ? legacy.destination
+      : `/${DEFAULT_LOCALE}${legacy.destination}`;
+    // 308, not 301: it preserves the method, and more importantly it is the
+    // code Next itself emits for `permanent: true`, so a rule that later moves
+    // into next.config.ts behaves identically.
+    return withCsp(NextResponse.redirect(url, 308));
   }
 
   // Locale routing. Without this, `/` 404s: every public page lives under

@@ -2,9 +2,10 @@
 import 'server-only';
 import { layout, esc, row, table, textBlock, type MailLocale } from '../render';
 import type { Message } from '../transport';
+import type { FormType } from '@/lib/forms/form-types';
 
 export interface FormMailData {
-  type: 'contact' | 'newsletter';
+  type: FormType;
   locale: MailLocale;
   fields: Record<string, string>;
   pageSlug?: string | null;
@@ -15,9 +16,16 @@ const T = {
   ar: {
     contactSubject: 'رسالة جديدة من نموذج التواصل',
     newsletterSubject: 'اشتراك جديد في النشرة البريدية',
+    careerSubject: 'طلب وظيفة جديد',
+    trainingSubject: 'طلب تدريب جديد',
     contactTitle: 'رسالة جديدة',
     newsletterTitle: 'اشتراك جديد',
+    careerTitle: 'طلب وظيفة',
+    trainingTitle: 'طلب تدريب',
     intro: 'وصل إرسال جديد من الموقع.',
+    // Applications carry a CV, and the file is behind the admin login — so the
+    // email says a file exists and where to read it, never attaches it.
+    attachmentNote: 'المرفقات متوفرة في لوحة التحكم ← النماذج.',
     page: 'الصفحة',
     time: 'الوقت',
     footer: 'إشعار تلقائي من نظام الموقع.',
@@ -25,9 +33,14 @@ const T = {
   en: {
     contactSubject: 'New contact form message',
     newsletterSubject: 'New newsletter signup',
+    careerSubject: 'New job application',
+    trainingSubject: 'New training application',
     contactTitle: 'New message',
     newsletterTitle: 'New signup',
+    careerTitle: 'Job application',
+    trainingTitle: 'Training application',
     intro: 'A new submission arrived from the website.',
+    attachmentNote: 'Attachments are in the admin panel under Forms.',
     page: 'Page',
     time: 'Time',
     footer: 'Automated notification from the website.',
@@ -58,7 +71,31 @@ function humanise(key: string): string {
  */
 export function formAlert(data: FormMailData): Omit<Message, 'to'> {
   const t = T[data.locale];
-  const isContact = data.type === 'contact';
+
+  /**
+   * Subject and heading per form type.
+   *
+   * This was `isContact ? contactSubject : newsletterSubject`, which sent every
+   * job application under the subject "New newsletter signup" the moment the
+   * two application types were added — a recruiter filtering their inbox on
+   * that subject would never have seen one.
+   */
+  const SUBJECT: Record<FormType, string> = {
+    contact: t.contactSubject,
+    newsletter: t.newsletterSubject,
+    career: t.careerSubject,
+    training: t.trainingSubject,
+  };
+  const TITLE: Record<FormType, string> = {
+    contact: t.contactTitle,
+    newsletter: t.newsletterTitle,
+    career: t.careerTitle,
+    training: t.trainingTitle,
+  };
+
+  const subject = SUBJECT[data.type];
+  const title = TITLE[data.type];
+  const isApplication = data.type === 'career' || data.type === 'training';
 
   const fieldRows = Object.entries(data.fields)
     .filter(([, value]) => String(value ?? '').trim() !== '')
@@ -73,16 +110,16 @@ export function formAlert(data: FormMailData): Omit<Message, 'to'> {
   ].join('');
 
   return {
-    subject: isContact ? t.contactSubject : t.newsletterSubject,
+    subject,
     html: layout({
       locale: data.locale,
-      title: isContact ? t.contactTitle : t.newsletterTitle,
-      intro: t.intro,
+      title,
+      intro: isApplication ? `${t.intro} ${t.attachmentNote}` : t.intro,
       body: table(fieldRows + metaRows),
       footer: t.footer,
     }),
     text: textBlock([
-      isContact ? t.contactTitle : t.newsletterTitle,
+      title,
       '',
       ...Object.entries(data.fields).map(([k, v]) => `${humanise(k)}: ${v}`),
       '',

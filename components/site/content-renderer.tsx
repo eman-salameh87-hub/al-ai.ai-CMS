@@ -20,6 +20,10 @@ import { ContactFormBlock, NewsletterBlock } from '@/components/site/blocks/form
 import { ProductGridBlock } from '@/components/site/blocks/product-grid';
 import { SliderBlock } from '@/components/site/blocks/slider';
 import { DownloadsBlock } from '@/components/site/blocks/downloads';
+import {
+  VideoHeroBlock, LogoCarouselBlock, BlogStripBlock, ClientFilterBlock,
+  ApplicationFormBlock,
+} from '@/components/site/blocks/legacy-blocks';
 import { resolveCustomBlock } from '@/lib/blocks/custom-registry';
 import type { ContentBlock } from '@/lib/blocks/types';
 
@@ -29,15 +33,23 @@ interface ContentRendererProps {
   blocks: ContentBlock[] | null | undefined;
   /** Needed by blocks that query content themselves (recent-posts). */
   locale?: 'ar' | 'en';
+  /**
+   * The page these blocks are on.
+   *
+   * Recorded against a form submission, so the inbox can say an application
+   * arrived from /careers rather than from somewhere. Optional — a block tree
+   * rendered outside a page context simply has none.
+   */
+  pageSlug?: string;
 }
 
-export function ContentRenderer({ blocks, locale = 'ar' }: ContentRendererProps) {
+export function ContentRenderer({ blocks, locale = 'ar', pageSlug }: ContentRendererProps) {
   if (!blocks || !Array.isArray(blocks)) return null;
 
   return (
     <div className="space-y-6" data-test-id="content-renderer">
       {blocks.map((block, idx) => (
-        <BlockRenderer key={idx} block={block} locale={locale} />
+        <BlockRenderer key={idx} block={block} locale={locale} pageSlug={pageSlug} />
       ))}
     </div>
   );
@@ -53,7 +65,15 @@ const HEADING_SIZE = {
   4: 'text-lg',
 } as const;
 
-function BlockRenderer({ block, locale }: { block: ContentBlock; locale: 'ar' | 'en' }) {
+function BlockRenderer({
+  block,
+  locale,
+  pageSlug,
+}: {
+  block: ContentBlock;
+  locale: 'ar' | 'en';
+  pageSlug?: string;
+}) {
   switch (block.type) {
     case 'heading': {
       const Tag = HEADING_TAG[block.level];
@@ -381,7 +401,7 @@ function BlockRenderer({ block, locale }: { block: ContentBlock; locale: 'ar' | 
               <summary className="cursor-pointer font-medium text-site-ink">{item.title}</summary>
               <div className="mt-3 space-y-4">
                 {item.content.map((child, i) => (
-                  <BlockRenderer key={i} block={child} locale={locale} />
+                  <BlockRenderer key={i} block={child} locale={locale} pageSlug={pageSlug} />
                 ))}
               </div>
             </details>
@@ -399,7 +419,7 @@ function BlockRenderer({ block, locale }: { block: ContentBlock; locale: 'ar' | 
               </h3>
               <div className="space-y-4">
                 {item.content.map((child, i) => (
-                  <BlockRenderer key={i} block={child} locale={locale} />
+                  <BlockRenderer key={i} block={child} locale={locale} pageSlug={pageSlug} />
                 ))}
               </div>
             </section>
@@ -415,6 +435,28 @@ function BlockRenderer({ block, locale }: { block: ContentBlock; locale: 'ar' | 
 
     case 'product-grid':
       return <ProductGridBlock block={block} locale={locale} />;
+
+    /*
+     * The five blocks added for the new-aeon.com rebuild.
+     *
+     * Four of them are async Server Components. Returning one from this
+     * synchronous switch is fine — React awaits an async child itself, and this
+     * function does not have to become async to render one.
+     */
+    case 'video-hero':
+      return <VideoHeroBlock block={block} locale={locale} />;
+
+    case 'logo-carousel':
+      return <LogoCarouselBlock block={block} locale={locale} />;
+
+    case 'blog-strip':
+      return <BlogStripBlock block={block} locale={locale} />;
+
+    case 'client-filter':
+      return <ClientFilterBlock block={block} locale={locale} />;
+
+    case 'application-form':
+      return <ApplicationFormBlock block={block} locale={locale} pageSlug={pageSlug} />;
 
     case 'custom': {
       // Resolved through an explicit allow-list; an unregistered name renders

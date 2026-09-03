@@ -1,0 +1,48 @@
+# migration/docker-compose.legacy.yml
+#
+# A throwaway SQL Server, so the legacy backup can be read without touching the
+# live server the old site still runs against.
+#
+# This is NOT part of the application. It exists for the length of the content
+# migration and is deleted afterwards — which is why it is a separate compose
+# file from the one in the project root, and why nothing in the app has a
+# connection string pointing at it. The migration scripts read from here and
+# write through the CMS's own API, so nothing bypasses validation.
+#
+# APPLE SILICON: the SQL Server image is amd64-only and runs under Rosetta.
+# It is slow to start (allow 60-90s before the first connection succeeds) and
+# fine for a one-off read. `platform` is pinned rather than left to Docker's
+# guess, because without it the pull fails outright on arm64 rather than
+# falling back.
+services:
+  legacy-mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    platform: linux/amd64
+    container_name: new-aeon-legacy-mssql
+    environment:
+      ACCEPT_EULA: "Y"
+      # Local-only, on a container with no published route off this machine.
+      # It still has to satisfy SQL Server's own complexity rule or the process
+      # exits on boot with a message that does not say so.
+      MSSQL_SA_PASSWORD: "LegacyMigration!2026"
+      MSSQL_PID: Developer
+    ports:
+      # 1434, not 1433: a developer with a real SQL Server or another container
+      # on the default port should not have this silently fail to bind.
+      - "1434:1433"
+    volumes:
+      # The .bak, read-only. Mounted rather than copied so a 112 MB file is not
+      # duplicated into the container's writable layer.
+      - ./legacy-db:/backups:ro
+      - legacy-mssql-data:/var/opt/mssql
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$$MSSQL_SA_PASSWORD" -C -Q "SELECT 1" || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 60s
+
+volumes:
+  legacy-mssql-data:

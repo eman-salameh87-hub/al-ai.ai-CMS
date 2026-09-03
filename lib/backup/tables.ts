@@ -27,6 +27,17 @@ export const BACKUP_TABLES = [
   'tag_i18n',
   'navigation',
   'navigation_i18n',
+  /**
+   * Redirects are configuration, and the most expensive kind to lose.
+   *
+   * The rows here are the moves no rule could express — a legacy numeric blog
+   * id, a slug an editor changed during the migration — and each one exists
+   * because someone worked out where an old URL should point. Recreating that
+   * knowledge means re-reading Search Console, so it is backed up with the
+   * content it describes. The `hits` counter comes along, which is fine: it is
+   * a report, not state anything depends on.
+   */
+  'redirects',
 
   // Catalogue
   'brands',

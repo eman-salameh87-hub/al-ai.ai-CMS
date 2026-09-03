@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus, Trash2, Loader2, Lock } from 'lucide-react';
+import { Plus, Trash2, Loader2, Lock, SlidersHorizontal } from 'lucide-react';
+import { FieldDefinitionsEditor } from './field-definitions-editor';
 import { useT } from './i18n-provider';
 import type { ContentTypeRow } from '@/lib/content/types-admin';
 
@@ -45,6 +46,14 @@ export function ContentTypesManager({ initial }: { initial: ContentTypeRow[] }) 
   const [draft, setDraft] = useState<Draft>(emptyDraft());
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  /**
+   * Which type's fields are open, by id.
+   *
+   * One at a time: two open editors are two unsaved drafts of two different
+   * types, and the "you have unsaved changes" problem is not worth having on
+   * this screen.
+   */
+  const [editingFields, setEditingFields] = useState<string | null>(null);
 
   const save = async () => {
     setBusy(true);
@@ -132,6 +141,31 @@ export function ContentTypesManager({ initial }: { initial: ContentTypeRow[] }) 
                 </td>
                 <td className="p-3 tabular-nums">{row.entryCount}</td>
                 <td className="p-3 text-end">
+                  {/*
+                    Available on built-in types too. `page` and `post` can
+                    legitimately want a field — the reason they cannot be
+                    DELETED is that they own hand-built screens, which has
+                    nothing to do with what fields they carry.
+                  */}
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setEditingFields((open) => (open === row.id ? null : row.id))
+                    }
+                    className="rounded p-1 text-[var(--admin-text-muted)] hover:text-[var(--admin-text)]"
+                    aria-label={t('fields.manage')}
+                    title={t('fields.manage')}
+                    aria-expanded={editingFields === row.id}
+                    data-test-id={`type-fields-${row.slug}`}
+                  >
+                    <SlidersHorizontal size={14} aria-hidden="true" />
+                    {row.customFields.length > 0 && (
+                      <span className="ms-1 text-[10px] tabular-nums">
+                        {row.customFields.length}
+                      </span>
+                    )}
+                  </button>
+
                   {!row.isBuiltIn && (
                     <button
                       type="button"
@@ -149,6 +183,29 @@ export function ContentTypesManager({ initial }: { initial: ContentTypeRow[] }) 
           </tbody>
         </table>
       </div>
+
+      {/*
+        Outside the table, not as a colspan row inside it.
+        
+        A form nested in a <td> inherits the table's layout, and the grid this
+        editor uses collapses to one column inside a table cell.
+      */}
+      {editingFields && (() => {
+        const type = initial.find((row) => row.id === editingFields);
+        if (!type) return null;
+        return (
+          <FieldDefinitionsEditor
+            key={type.id}
+            type={type}
+            onClose={() => {
+              setEditingFields(null);
+              // The row's field count comes from the server, so a save has to
+              // be reflected by re-reading it.
+              router.refresh();
+            }}
+          />
+        );
+      })()}
 
       {creating ? (
         <div className="admin-card flex flex-col gap-3">

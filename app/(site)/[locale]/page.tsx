@@ -5,6 +5,7 @@ import { ContentRenderer } from '@/components/site/content-renderer';
 import { notFound } from 'next/navigation';
 import { locales, type Locale } from '@/lib/env';
 import { asContentBlocks } from '@/lib/blocks/content-schema';
+import { isHeroBlock } from '@/lib/blocks/layout';
 
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -19,19 +20,24 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const blocks = asContentBlocks(homeContent?.i18n?.body);
 
   /**
-   * A slider in the first position IS the hero.
+   * A band block in the first position IS the hero.
    *
    * Rendering both put a static banner above the thing built to be the banner,
    * so the slider started halfway down the page behind something it was meant
    * to replace. The generic HeroSection stays for a home page that has no
-   * slider — otherwise such a site would open abruptly on body text — so this
-   * is "the slider takes over", not "the banner is gone".
+   * such block — otherwise such a site would open abruptly on body text — so
+   * this is "the hero block takes over", not "the banner is gone".
+   *
+   * Checked against lib/blocks/layout.ts rather than `=== 'slider'`, because
+   * `video-hero` is now the other block that means this. Hardcoding one type
+   * here is what made the new-aeon.com home page render a placeholder banner
+   * above its own video.
    */
-  const leadsWithSlider = blocks[0]?.type === 'slider';
+  const leadsWithHero = isHeroBlock(blocks[0]?.type ?? '');
 
   return (
     <div>
-      {!leadsWithSlider && (
+      {!leadsWithHero && (
         <HeroSection
           title={homeContent?.i18n?.title || 'New Aeon'}
           subtitle={homeContent?.i18n?.excerpt || 'Content Management System'}
@@ -42,7 +48,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       {blocks.length > 0 && (
         // No top padding when the slider leads: a hero has to sit flush under
         // the navbar, and py-16 would leave a band of white above it.
-        <section className={leadsWithSlider ? 'pb-16 px-4 max-w-4xl mx-auto' : 'py-16 px-4 max-w-4xl mx-auto'}>
+        <section className={leadsWithHero ? 'pb-16 px-4 max-w-4xl mx-auto' : 'py-16 px-4 max-w-4xl mx-auto'}>
           <ContentRenderer blocks={blocks} locale={typedLocale} />
         </section>
       )}

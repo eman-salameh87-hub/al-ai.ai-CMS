@@ -7,6 +7,7 @@ import { eq } from 'drizzle-orm';
 import { requireApiAuth } from '@/lib/auth/api-guard';
 import { checkPrefix } from '@/lib/content/types-admin';
 import { slugSchema } from '@/lib/taxonomy-schema';
+import { fieldDefinitionsSchema } from '@/lib/content/custom-fields';
 
 export const runtime = 'nodejs';
 
@@ -24,6 +25,14 @@ const typeSchema = z.object({
   hasFeaturedImage: z.boolean().default(true),
   isActive: z.boolean().default(true),
   sortOrder: z.number().int().min(0).max(9999).default(0),
+  /**
+   * The fields entries of this type carry, beyond title/body/image.
+   *
+   * Validated here rather than trusted: this lands in a jsonb column that the
+   * editor screen, the write validator and the site templates all read, and
+   * a malformed definition breaks all three at once.
+   */
+  customFields: fieldDefinitionsSchema.default([]),
 });
 
 export async function POST(request: Request) {

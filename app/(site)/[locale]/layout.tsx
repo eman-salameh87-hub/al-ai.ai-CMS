@@ -6,7 +6,7 @@
 // full document load, which is fine — they are separate applications.)
 import type { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
-import { Cairo, Inter } from 'next/font/google';
+import { Bitter, Cairo, Inter, Lato } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, setRequestLocale } from 'next-intl/server';
 import { headers } from 'next/headers';
@@ -26,7 +26,33 @@ import { SiteSchema } from '@/components/site/site-schema';
 import { WhatsAppButton } from '@/components/site/whatsapp-button';
 import '../../globals.css';
 
+/*
+ * The typefaces new-aeon.com has always used.
+ *
+ * Bitter for headings and Lato for Latin body copy are what the legacy site
+ * loaded from Google Fonts; Cairo carries Arabic, which neither of the other
+ * two covers. Keeping all four means the rebuilt site reads as the same site
+ * rather than as a redesign — the brief was the existing look and feel.
+ *
+ * Weights are pinned rather than left to the default. `next/font` fetches every
+ * available weight when none is named, which for Bitter is nine files nobody
+ * uses; the legacy CSS only ever asked for bold headings and light body text.
+ */
+const bitter = Bitter({
+  subsets: ['latin'],
+  weight: ['400', '700'],
+  variable: '--font-display',
+  display: 'swap',
+});
+const lato = Lato({
+  subsets: ['latin'],
+  weight: ['300', '400', '700'],
+  variable: '--font-body',
+  display: 'swap',
+});
 const cairo = Cairo({ subsets: ['arabic', 'latin'], variable: '--font-cairo', display: 'swap' });
+// Kept: the admin shell and any component still naming font-inter resolve
+// through this variable, and dropping it would leave those with no family.
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
 
 export function generateStaticParams() {
@@ -168,7 +194,7 @@ export default async function SiteLayout({
       lang={typedLocale}
       dir={dir}
       data-theme={themeAttr}
-      className={`${cairo.variable} ${inter.variable} h-full`}
+      className={`${bitter.variable} ${lato.variable} ${cairo.variable} ${inter.variable} h-full`}
     >
       <body className="site-body min-h-full antialiased">
         {/* GTM requires its noscript iframe first inside <body>. */}

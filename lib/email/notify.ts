@@ -9,6 +9,7 @@ import { orderStatusChanged } from './templates/order-status';
 import { formAlert } from './templates/form';
 import type { MailLocale } from './render';
 import type { OrderStatus } from '@/lib/commerce/order-status';
+import type { FormType } from '@/lib/forms/form-types';
 
 /**
  * High-level "something happened, tell someone" helpers.
@@ -159,9 +160,9 @@ export async function notifyOrderStatusChanged(input: {
   }
 }
 
-/** Contact / newsletter submission alert to the store. */
+/** Any public form submission — enquiry, signup or application — alerted to the store. */
 export async function notifyFormSubmission(input: {
-  type: 'contact' | 'newsletter';
+  type: FormType;
   locale: MailLocale;
   fields: Record<string, string>;
   pageSlug?: string | null;

@@ -9,6 +9,8 @@ import {
   canEdit, checkStatusChange, PERMISSION_MESSAGE,
 } from '@/lib/content/permissions';
 import { contentPayloadSchema, asContentBlocks } from '@/lib/blocks/content-schema';
+import { parseFieldDefinitions, validateFieldValues } from '@/lib/content/custom-fields';
+import { contentTypes } from '@/lib/db/schema';
 import { setContentTaxonomy } from '@/lib/content/taxonomy';
 
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -52,12 +54,45 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       );
     }
 
+    /*
+     * Field values are checked against the type this entry ALREADY has — the
+     * payload does not carry a type, and an entry's type is not editable.
+     * Loading it here rather than trusting the client is what keeps the
+     * validation honest on update as well as on create.
+     */
+    const [ownType] = current.typeId
+      ? await db
+          .select({ customFields: contentTypes.customFields })
+          .from(contentTypes)
+          .where(eq(contentTypes.id, current.typeId))
+          .limit(1)
+      : [];
+
+    const definitions = parseFieldDefinitions(ownType?.customFields);
+    const fields = validateFieldValues(definitions, validated.customFieldValues ?? {});
+    if (!fields.ok) {
+      return NextResponse.json(
+        { success: false, error: { message: 'Validation failed', fields: fields.errors } },
+        { status: 400 }
+      );
+    }
+
     await db
       .update(content)
       .set({
         slug: validated.slug,
         status: validated.status,
         featuredImage: validated.featuredImage ?? null,
+        /*
+         * Left ALONE when the payload omits the key and the type has fields.
+         *
+         * An editor screen that does not yet render a field must not wipe its
+         * stored value by saving the page — the same reasoning as the
+         * per-locale upsert below, which leaves an absent locale untouched.
+         */
+        ...(definitions.length && validated.customFieldValues !== undefined
+          ? { customFieldValues: fields.values }
+          : {}),
         updatedAt: new Date(),
         // Stamp publishedAt on the draft -> published transition only, so
         // re-saving a live page does not reset its publication date.

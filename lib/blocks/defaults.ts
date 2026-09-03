@@ -44,6 +44,14 @@ export const BLOCK_LABEL_KEYS: Record<BlockType, MessageKey> = {
   'social-links': 'block.social-links',
   'recent-posts': 'block.recent-posts',
   'product-grid': 'block.product-grid',
+  // The five blocks the legacy home page and Portfolio page needed and this
+  // CMS had no equivalent for. See lib/blocks/types.ts for why each is its own
+  // type rather than a variant of an existing one.
+  'video-hero': 'block.video-hero',
+  'logo-carousel': 'block.logo-carousel',
+  'blog-strip': 'block.blog-strip',
+  'client-filter': 'block.client-filter',
+  'application-form': 'block.application-form',
   custom: 'block.custom',
 };
 
@@ -67,6 +75,8 @@ export const EDITABLE_BLOCKS: ReadonlySet<BlockType> = new Set<BlockType>([
   'video', 'embed', 'team', 'timeline', 'social-links', 'recent-posts', 'map',
   'newsletter', 'contact-form', 'table', 'pricing', 'comparison',
   'product-grid', 'custom', 'accordion', 'faq', 'tabs', 'slider', 'downloads',
+  'video-hero', 'logo-carousel', 'blog-strip', 'client-filter',
+  'application-form',
 ]);
 
 /**
@@ -117,6 +127,29 @@ const FACTORIES: { [K in BlockType]: () => Extract<ContentBlock, { type: K }> } 
   'social-links': () => ({ type: 'social-links', platforms: [], style: 'icons' }),
   'recent-posts': () => ({ type: 'recent-posts', title: '', count: 3, layout: 'grid' }),
   'product-grid': () => ({ type: 'product-grid', productIds: [], layout: 'grid' }),
+  'video-hero': () => ({
+    type: 'video-hero',
+    src: '',
+    // Required by the type, so the factory must supply it rather than leaving
+    // an invalid block for the editor to trip over.
+    poster: '',
+    loop: true,
+    height: 'viewport',
+  }),
+  'logo-carousel': () => ({ type: 'logo-carousel', logos: [], speedSeconds: 40, grayscale: true }),
+  'blog-strip': () => ({ type: 'blog-strip', count: 6, layout: 'grid' }),
+  'client-filter': () => ({
+    type: 'client-filter',
+    // The catalogue this was built for. An editor can point it elsewhere.
+    contentType: 'client',
+    columns: 4,
+    pageSize: 24,
+  }),
+  'application-form': () => ({
+    type: 'application-form',
+    kind: 'career',
+    attachmentRequired: true,
+  }),
   custom: () => ({ type: 'custom', component: '', props: {} }),
 };
 

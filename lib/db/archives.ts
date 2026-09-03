@@ -5,7 +5,7 @@ import {
   categories, categoryI18n, tags, tagI18n,
 } from './schema';
 import { and, desc, eq } from 'drizzle-orm';
-import type { ContentTypeSlug } from '@/lib/content/content-types';
+
 
 export interface ArchiveEntry {
   slug: string;
@@ -17,9 +17,18 @@ export interface ArchiveEntry {
 
 const published = eq(content.status, 'published');
 
-/** Published items of one content type, newest first. */
+/**
+ * Published items of one content type, newest first.
+ *
+ * `typeSlug` is a plain string, not ContentTypeSlug. It was the narrow union —
+ * page | post | resource — which meant this helper could not list the entries
+ * of a type an administrator had created, and a custom type's archive is the
+ * whole reason `content_types.routePrefix` exists. An unknown slug matches no
+ * rows and returns [], which is the same answer the union gave by refusing to
+ * compile, minus the false claim that only three types can exist.
+ */
 export async function listByType(
-  typeSlug: ContentTypeSlug,
+  typeSlug: string,
   locale: 'ar' | 'en',
   limit = 50
 ): Promise<ArchiveEntry[]> {

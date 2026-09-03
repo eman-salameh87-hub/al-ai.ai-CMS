@@ -6,6 +6,7 @@ import { useState } from 'react';
 import {
   LayoutGrid, Package, BookOpen, Tag, Layers, ShoppingBag, Images, ImageIcon,
   Ticket, Truck, Settings, ShieldCheck, FileText, Link2, LogOut, ExternalLink, Star, Boxes, Users,
+  Milestone,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { BrandMark } from './brand-mark';
@@ -56,6 +57,10 @@ function buildNavigation(adminPath: string): NavItem[] {
     { key: 'nav.coupons', href: `${adminPath}/commerce/coupons`, icon: Ticket, commerceOnly: true },
     { key: 'nav.shipping', href: `${adminPath}/commerce/shipping`, icon: Truck, commerceOnly: true },
     { key: 'nav.forms', href: `${adminPath}/forms`, icon: Link2 },
+    // Next to Forms rather than under Settings: a redirect is a piece of
+    // content routing an editor reasons about alongside pages, not a system
+    // preference.
+    { key: 'nav.redirects', href: `${adminPath}/redirects`, icon: Milestone },
     { key: 'nav.settings', href: `${adminPath}/settings`, icon: Settings },
     { key: 'nav.users', href: `${adminPath}/users`, icon: ShieldCheck },
   ];

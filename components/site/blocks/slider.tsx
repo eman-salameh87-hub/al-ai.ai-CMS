@@ -12,6 +12,7 @@ import {
   type SliderBlock as SliderBlockType,
 } from '@/lib/blocks/slider';
 import { youTubeEmbedUrl, youTubeId, youTubeThumbnail } from '@/lib/blocks/youtube';
+import { FULL_BLEED } from '@/lib/blocks/layout';
 
 const COPY = {
   ar: {
@@ -216,11 +217,9 @@ export function SliderBlock({
         showcase
           ? 'bg-site-surface-inverted py-8 sm:py-12'
           : 'bg-site-surface-raised',
-        // Full bleed. Every page wraps its blocks in `max-w-4xl mx-auto`, so
-        // the band has to break out to reach the edges. `overflow-x: clip` on
-        // <main> absorbs the scrollbar width that 100vw counts and the visible
-        // area does not.
-        'mx-[calc(50%-50vw)] w-screen max-w-[100vw]'
+        // Full bleed — see lib/blocks/layout.ts for why, and for the
+        // <main> overflow-x: clip that makes it not add a scrollbar.
+        FULL_BLEED
       )}
       data-test-id="slider"
       data-variant={block.variant}

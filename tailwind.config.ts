@@ -55,6 +55,17 @@ const config: Config = {
         // next/font variables, not literal family names.
         cairo: ['var(--font-cairo)', 'system-ui', 'sans-serif'],
         inter: ['var(--font-inter)', 'system-ui', 'sans-serif'],
+        /*
+         * The New Aeon pair. `display` is Bitter (headings) and `body` is Lato,
+         * matching the legacy site.
+         *
+         * Cairo is the fallback in BOTH, not an afterthought: an Arabic heading
+         * has no glyphs in Bitter, and without Cairo next in the stack it would
+         * render in whatever the system picked — which is how a bilingual site
+         * ends up with two different-looking languages.
+         */
+        display: ['var(--font-display)', 'var(--font-cairo)', 'Georgia', 'serif'],
+        body: ['var(--font-body)', 'var(--font-cairo)', 'system-ui', 'sans-serif'],
       },
       spacing: { sidebar: '16rem', header: '4rem' },
       borderRadius: { sm: '6px', md: '8px', lg: '12px', xl: '16px' },
