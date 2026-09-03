@@ -62,3 +62,5 @@ prompt-archive/
 # Assembled deployment packages. Built artefacts containing node_modules and
 # the media library — regenerate with deploy/<host>/build-package.sh.
 /deploy/*/out/
+# Finder duplicates ("out 2") of the same thing.
+/deploy/*/out */
