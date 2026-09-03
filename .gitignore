@@ -58,3 +58,7 @@ prompt-archive/
 /migration/legacy-db/*.bak
 /migration/legacy-db/*.rar
 /migration/out/
+
+# Assembled deployment packages. Built artefacts containing node_modules and
+# the media library — regenerate with deploy/<host>/build-package.sh.
+/deploy/*/out/
