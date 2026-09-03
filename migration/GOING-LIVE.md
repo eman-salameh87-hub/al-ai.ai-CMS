@@ -147,9 +147,10 @@ Order matters. Nothing here touches the live site until the last step.
 ## Before you go live
 
 - [ ] **Rotate the legacy database credentials.** `NewAeonWebsite/Web.config`
-      contains three sets in plain text, including `devteam` on `65.21.21.164`.
-      They have been sitting in a folder on disk; treat them as compromised
-      whatever you decide about the repo.
+      holds three sets in plain text — a live server, a staging one, and a local
+      `sa` account. The specifics stay in that file and are deliberately not
+      repeated here, so this document is safe to share. They have been sitting
+      unencrypted on disk, so treat them as compromised either way.
 - [ ] **Decide about the 8.1 MB hero GIF.** It exceeds the 8 MB media cap, so
       the home slider currently shows two slides instead of three. Converting it
       to animated WebP is the cleanest fix — it is also 8 MB before anything
