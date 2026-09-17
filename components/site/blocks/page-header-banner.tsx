@@ -56,7 +56,7 @@ export function PageHeaderBanner({ image, alt, eyebrow, title, text, cover }: Pa
           <div className="ph-caption-inner">
             {eyebrow && (
               <div className="ph-caption-categories">
-                <span className="ph-caption-category text-white">{eyebrow}</span>
+                <span className="ph-caption-category text-site-ink-inverted">{eyebrow}</span>
               </div>
             )}
 
@@ -80,7 +80,7 @@ export function PageHeaderBanner({ image, alt, eyebrow, title, text, cover }: Pa
 
             {text && (
               <div className="ph-caption-categories">
-                <span className="ph-caption-category text-white">{text}</span>
+                <span className="ph-caption-category text-site-ink-inverted">{text}</span>
               </div>
             )}
           </div>

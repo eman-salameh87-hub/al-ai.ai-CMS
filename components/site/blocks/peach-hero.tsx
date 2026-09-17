@@ -29,7 +29,7 @@ interface PeachHeroProps {
 
 export function PeachHero({ src = 'https://severe-fncjenao.peachworlds.com/' }: PeachHeroProps) {
   return (
-    <div className={`relative h-screen w-screen overflow-hidden bg-black ${FULL_BLEED}`}>
+    <div className={`relative h-screen w-screen overflow-hidden bg-site-surface-inverted ${FULL_BLEED}`}>
       <iframe
         src={src}
         title="al-ai.ai"

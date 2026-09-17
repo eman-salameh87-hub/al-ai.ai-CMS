@@ -85,7 +85,7 @@ export function Navbar({ navigation, logo, siteName, locale }: NavbarProps) {
                 // legible stand-in rather than an attempt to fake the mark.
                 // Plain Tailwind, not a tt-* class: there's no source rule
                 // for this state to hook into.
-                <span className="text-xl font-bold text-white">{siteName}</span>
+                <span className="text-xl font-bold text-site-ink-inverted">{siteName}</span>
               )}
             </Link>
           </div>
