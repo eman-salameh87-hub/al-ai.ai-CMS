@@ -64,6 +64,10 @@ COPY --from=builder /app/lib/db/migrations ./lib/db/migrations
 COPY --from=builder /app/migrate.cjs ./migrate.cjs
 
 RUN mkdir -p public/uploads && chown -R nextjs:nodejs public/uploads
+# next/image's built-in optimizer writes resized copies here at request time.
+# .next/ is copied in as root above, so the nextjs user has no write access to
+# it — every optimized image request failed with EACCES until this existed.
+RUN mkdir -p .next/cache/images && chown -R nextjs:nodejs .next/cache
 
 USER nextjs
 
