@@ -38,6 +38,7 @@
   "exclude": [
     "node_modules",
     "deploy/*/out",
-    "deploy/**/out"
+    "deploy/**/out",
+    "Claude outputs"
   ]
 }

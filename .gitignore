@@ -39,6 +39,11 @@ cookies.txt
 c[0-9].txt
 ce.txt
 
+# Scratch/draft output from an assistant session — not real app source, and
+# its stray .ts file breaks `tsc`/next build when it gets committed (as
+# happened here: "Cannot find name 'ContentBlock'" from an unfinished draft).
+/Claude outputs/
+
 # curl cookie jars from local API testing
 *.cookies
 shop.txt
