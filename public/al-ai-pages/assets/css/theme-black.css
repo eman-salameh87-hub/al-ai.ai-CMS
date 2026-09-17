@@ -8,7 +8,7 @@
 	--tt-dark-color: #efedea; /* Template dark color. #121212 */
 	--tt-light-color: #efedea; /* Template light color. #efedea */
 
-	--tt-bg-color: #090b0f; /* Template background color. #0a0a0a */
+	--tt-bg-color: #000000; /* Template background color. #0a0a0a */
 	--tt-text-color: #efedea; /* Template text color. # */
 	--tt-text-muted-color: #8f8f8f; /* Template text muted color. #8f8f8f */
 	--tt-border-color: rgb(133 133 133 / 50%); /* Template borders color. rgb(133 133 133 / 50%) */
@@ -5142,7 +5142,7 @@ body:not(.is-mobile) .tt-accordion.tt-ac-hover .tt-accordion-item.active .tt-acc
 	.tt-hac-item {
 		position: relative;
 		flex: 1 1;
-		background-color:#090b0f;
+		background-color:#000000;
 		padding: clamp(15px, 3vw, 35px);
 		border: 1px solid var(--tt-border-color);
 		border-radius: 25px;
@@ -9639,7 +9639,7 @@ svg.tt-stt-progress-circle path {
 }
 
 .tt-stte-card{
-	background-color: #020202;
+	background-color: #000000;
     color: #f2f1ee;
 }
 
@@ -9685,7 +9685,7 @@ svg.tt-stt-progress-circle path {
 
 
 body{
-	background-color:#090b0f;
+	background-color:#000000;
 }
 
 
@@ -9695,11 +9695,11 @@ body{
 
 
 .tt-section{
-	background-color:#090b0f;
+	background-color:#000000;
 }
 
 #tt-footer{
-	background-color:#090b0f;
+	background-color:#000000;
 }
 
 .tt-section-inner{
@@ -9707,7 +9707,7 @@ body{
 }
 
 .tt-stte-card{
-	background-color:#090b0f;
+	background-color:#000000;
 	justify-content: flex-start;
     display: flex;
     align-items: flex-start;
@@ -9737,7 +9737,7 @@ body{
 }
 
 #tt-page-content {
-    background-color: #090b0f;
+    background-color: #000000;
 }
 
 
@@ -9754,7 +9754,7 @@ body{
     	margin-left: 0px;
 	}
 	.tt-stte-card {
-    	background-color: #090b0f;
+    	background-color: #000000;
 	}
 	.tt-stte-item{
 		height: auto !important;
@@ -9778,11 +9778,11 @@ body{
 }
 
 .tt-section {
-    background-color: #010208 !important;
+    background-color: #000000 !important;
 }
 
 #tt-page-content {
-    background-color: #010208 !important;
+    background-color: #000000 !important;
 }
 
 #tt-footer{
@@ -9790,14 +9790,14 @@ body{
 }
 
 .tt-stte-card{
-		background-color: #010208 !important;
+		background-color: #000000 !important;
 }
 
 
 @media (min-width: 1025px) {
     .tt-hac-item
     {
-            background-color: #010208;
+            background-color: #000000;
     }
 	.tt-hac-alter-hover .tt-hac-item:first-child, .tt-hac-alter-hover .tt-hac-item.active{
 		background-color: #efedea;
@@ -9811,7 +9811,7 @@ body{
 .tt-col-xl-4 {
     position: relative;
     overflow: hidden;
-    background-color: #010208;
+    background-color: #000000;
     /* Scroll Timeline */
     view-timeline-name: --section-visible;
     view-timeline-axis: block;
