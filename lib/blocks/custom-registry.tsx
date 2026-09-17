@@ -34,40 +34,50 @@ export function registeredCustomBlocks(): string[] {
 // Nothing is registered by default, so a `custom` block renders nothing until a
 // developer opts a component in.
 
+// Each component below takes its OWN specific props type, not
+// Record<string, unknown> — a required field on any of them (e.g.
+// PageHeaderFullProps.title) makes `Component as CustomComponent` fail
+// under strict mode ("neither type sufficiently overlaps with the other"),
+// caught by `npm run typecheck`/`next build` but not by dev mode, which
+// never type-checks this file. Routing through `unknown` is the standard,
+// deliberate way to assert past that: resolveCustomBlock only ever hands a
+// component the props object seed-al-ai-pages.ts wrote for that exact
+// component name, so the mismatch the compiler is flagging cannot happen
+// at runtime — see this file's top comment on the allow-list design.
 import { PeachHero } from '@/components/site/blocks/peach-hero';
-registerCustomBlock('peach-hero', PeachHero as CustomComponent);
+registerCustomBlock('peach-hero', PeachHero as unknown as CustomComponent);
 
 // al-ai.ai layout-fidelity components — see each file's header comment for
 // which al-ai.ai-pages section it reproduces.
 import { SplitIntro } from '@/components/site/blocks/split-intro';
-registerCustomBlock('split-intro', SplitIntro as CustomComponent);
+registerCustomBlock('split-intro', SplitIntro as unknown as CustomComponent);
 
 import { ServicePanels } from '@/components/site/blocks/service-panels';
-registerCustomBlock('service-panels', ServicePanels as CustomComponent);
+registerCustomBlock('service-panels', ServicePanels as unknown as CustomComponent);
 
 import { SectorGrid } from '@/components/site/blocks/sector-grid';
-registerCustomBlock('sector-grid', SectorGrid as CustomComponent);
+registerCustomBlock('sector-grid', SectorGrid as unknown as CustomComponent);
 
 import { CompactList } from '@/components/site/blocks/compact-list';
-registerCustomBlock('compact-list', CompactList as CustomComponent);
+registerCustomBlock('compact-list', CompactList as unknown as CustomComponent);
 
 import { RoundCta } from '@/components/site/blocks/round-cta';
-registerCustomBlock('round-cta', RoundCta as CustomComponent);
+registerCustomBlock('round-cta', RoundCta as unknown as CustomComponent);
 
 import { HeadingArrow } from '@/components/site/blocks/heading-arrow';
-registerCustomBlock('heading-arrow', HeadingArrow as CustomComponent);
+registerCustomBlock('heading-arrow', HeadingArrow as unknown as CustomComponent);
 
 import { ContentSection } from '@/components/site/blocks/content-section';
-registerCustomBlock('content-section', ContentSection as CustomComponent);
+registerCustomBlock('content-section', ContentSection as unknown as CustomComponent);
 
 import { AboutIntro } from '@/components/site/blocks/about-intro';
-registerCustomBlock('about-intro', AboutIntro as CustomComponent);
+registerCustomBlock('about-intro', AboutIntro as unknown as CustomComponent);
 
 import { PageHeaderBanner } from '@/components/site/blocks/page-header-banner';
-registerCustomBlock('page-header-banner', PageHeaderBanner as CustomComponent);
+registerCustomBlock('page-header-banner', PageHeaderBanner as unknown as CustomComponent);
 
 import { ContactSection } from '@/components/site/blocks/contact-section';
-registerCustomBlock('contact-section', ContactSection as CustomComponent);
+registerCustomBlock('contact-section', ContactSection as unknown as CustomComponent);
 
 import { PageHeaderFull } from '@/components/site/blocks/page-header-full';
-registerCustomBlock('page-header-full', PageHeaderFull as CustomComponent);
+registerCustomBlock('page-header-full', PageHeaderFull as unknown as CustomComponent);
