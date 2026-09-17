@@ -27,6 +27,17 @@ type Draft = {
   sortOrder: number;
 };
 
+/**
+ * Built-in types own a hand-built admin screen at a fixed address; a custom
+ * type has no entries screen yet, so its row stays inert rather than
+ * linking somewhere that 404s.
+ */
+const BUILT_IN_ADMIN_PATH: Record<string, string> = {
+  page: '/admin/content/pages',
+  post: '/admin/content/posts',
+  resource: '/admin/content/resources',
+};
+
 const emptyDraft = (): Draft => ({
   slug: '',
   name: '',
@@ -119,8 +130,18 @@ export function ContentTypesManager({ initial }: { initial: ContentTypeRow[] }) 
             </tr>
           </thead>
           <tbody>
-            {initial.map((row) => (
-              <tr key={row.id} className="border-b border-[var(--admin-line)] last:border-b-0">
+            {initial.map((row) => {
+              const adminPath = BUILT_IN_ADMIN_PATH[row.slug];
+              return (
+              <tr
+                key={row.id}
+                onClick={adminPath ? () => router.push(adminPath) : undefined}
+                className={
+                  'border-b border-[var(--admin-line)] last:border-b-0' +
+                  (adminPath ? ' cursor-pointer hover:bg-white/5' : '')
+                }
+                data-test-id={`type-row-${row.slug}`}
+              >
                 <td className="p-3 font-medium">
                   <span className="inline-flex items-center gap-2">
                     {row.name}
@@ -140,7 +161,7 @@ export function ContentTypesManager({ initial }: { initial: ContentTypeRow[] }) 
                   {row.routePrefix ? `/${row.routePrefix}` : t('types.noPublicPage')}
                 </td>
                 <td className="p-3 tabular-nums">{row.entryCount}</td>
-                <td className="p-3 text-end">
+                <td className="p-3 text-end" onClick={(e) => e.stopPropagation()}>
                   {/*
                     Available on built-in types too. `page` and `post` can
                     legitimately want a field — the reason they cannot be
@@ -179,7 +200,8 @@ export function ContentTypesManager({ initial }: { initial: ContentTypeRow[] }) 
                   )}
                 </td>
               </tr>
-            ))}
+              );
+            })}
           </tbody>
         </table>
       </div>
