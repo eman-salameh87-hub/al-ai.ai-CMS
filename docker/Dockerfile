@@ -51,7 +51,9 @@ FROM node:24-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 # wget is in alpine's busybox; curl is NOT installed by default.
-RUN apk add --no-cache libc6-compat
+# su-exec drops from root to the nextjs user in the entrypoint, after the
+# entrypoint has fixed up ownership of the mounted volume for this run.
+RUN apk add --no-cache libc6-compat su-exec
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
@@ -67,9 +69,20 @@ RUN mkdir -p public/uploads && chown -R nextjs:nodejs public/uploads
 # next/image's built-in optimizer writes resized copies here at request time.
 # .next/ is copied in as root above, so the nextjs user has no write access to
 # it — every optimized image request failed with EACCES until this existed.
+# This directory is never on a volume, so this build-time chown is permanent.
 RUN mkdir -p .next/cache/images && chown -R nextjs:nodejs .next/cache
 
-USER nextjs
+COPY docker/entrypoint.sh ./entrypoint.sh
+RUN chmod +x ./entrypoint.sh
+
+# Deliberately staying root here. public/uploads is a Railway Volume mount:
+# its filesystem (including an ext4 lost+found owned by root:root, mode 700)
+# is attached AFTER this image is built, so the chown two lines up never sees
+# it and the nextjs user can't even list the directory at boot ("EACCES:
+# permission denied, scandir '/app/public/uploads/lost+found'"). The
+# entrypoint below re-chowns it fresh on every start, as root, then su-execs
+# into nextjs to actually run the app. Switching USER here would remove the
+# very privilege that fix needs.
 
 EXPOSE 3000
 ENV PORT=3000
@@ -82,7 +95,7 @@ ENV HOSTNAME="0.0.0.0"
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://127.0.0.1:3000/api/health || exit 1
 
-# Migrate, then serve.
+# Fix volume ownership (root), drop to nextjs, migrate, then serve.
 #
 # Railway's Postgres has no public endpoint, so migrations can only run from
 # inside the private network. The intended hook is railway.json's
