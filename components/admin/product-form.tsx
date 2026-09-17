@@ -20,7 +20,7 @@ import type { MessageKey } from '@/lib/admin-i18n';
 
 export type { ProductFormValue, ProductTranslationDraft, VariantDraft };
 
-const LOCALES: ReadonlyArray<'ar' | 'en'> = ['ar', 'en'];
+const LOCALES: ReadonlyArray<'ar' | 'en'> = ['en', 'ar'];
 const LOCALE_KEY: Record<'ar' | 'en', MessageKey> = { ar: 'form.localeAr', en: 'form.localeEn' };
 
 interface Props {
@@ -39,7 +39,7 @@ export function ProductForm({
   const t = useT();
   const router = useRouter();
   const [value, setValue] = useState<ProductFormValue>(initial);
-  const [locale, setLocale] = useState<'ar' | 'en'>('ar');
+  const [locale, setLocale] = useState<'ar' | 'en'>('en');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

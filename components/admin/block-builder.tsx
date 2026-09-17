@@ -22,6 +22,51 @@ import {
 import type { ContentBlock } from '@/lib/blocks/types';
 import { useT } from './i18n-provider';
 
+const SUMMARY_MAX = 40;
+const truncate = (s: string) => (s.length > SUMMARY_MAX ? `${s.slice(0, SUMMARY_MAX)}…` : s);
+
+/**
+ * Common "this is the section people would recognize it by" props, checked
+ * in order. Every custom block registered in lib/blocks/custom-registry.tsx
+ * uses one of these names for its heading/eyebrow — see each component's own
+ * props interface under components/site/blocks/.
+ */
+const CUSTOM_TITLE_KEYS = ['title', 'heading', 'talkTitle', 'eyebrow'] as const;
+
+/**
+ * The block list showed every `custom` block as the identical, generic
+ * "Custom component #1", "#2", ... — with 8+ of them on one page (every
+ * al-ai.ai-pages section is now a `custom` block, see lib/blocks/
+ * custom-registry.tsx), there was no way to tell them apart without
+ * expanding each one. This pulls the component name plus whatever heading
+ * text it carries, and for a few other common text-bearing block types
+ * pulls their own text, so the list reads like a table of contents.
+ */
+function blockSummary(block: ContentBlock): string {
+  switch (block.type) {
+    case 'custom': {
+      const props = block.props as Record<string, unknown>;
+      for (const key of CUSTOM_TITLE_KEYS) {
+        const value = props[key];
+        if (typeof value === 'string' && value.trim()) {
+          return `${block.component} — ${truncate(value.trim().replace(/\n/g, ' '))}`;
+        }
+      }
+      return block.component || '';
+    }
+    case 'heading':
+      return truncate(block.text);
+    case 'paragraph':
+      return truncate(block.text);
+    case 'quote':
+      return truncate(block.text);
+    case 'cta':
+      return truncate(block.title);
+    default:
+      return '';
+  }
+}
+
 interface BlockBuilderProps {
   blocks: ContentBlock[];
   onChange: (blocks: ContentBlock[]) => void;
@@ -167,8 +212,25 @@ export function BlockBuilder({
           counter is module-level) and handleDragEnd bails on an id it does not
           own, so a stray event cannot corrupt the wrong list either.
 
-          The keyboard sensor does NOT survive nesting — see the handle. */}
-      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          The keyboard sensor does NOT survive nesting — see the handle.
+
+          `id` is explicit rather than left to dnd-kit's default: with none,
+          it assigns the aria-describedby id from a module-level counter
+          incremented in RENDER order, which is a hydration mismatch waiting
+          to happen — the server and client don't always construct every
+          DndContext on the page in the same order (an admin page with more
+          than one drag-reorderable field, or a data fetch that resolves a
+          conditional block before the client's first render does). React
+          then throws exactly the aria-describedby "0" vs "1" mismatch this
+          fixes. `testScope` is already unique per builder instance (each
+          nesting level extends it), so it doubles as a stable, deterministic
+          id here for free. */}
+      <DndContext
+        id={`${testScope}-dnd`}
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
         <SortableContext items={keys} strategy={verticalListSortingStrategy}>
           <ul className="space-y-4" id={listId}>
             {blocks.map((block, idx) => {
@@ -286,6 +348,7 @@ function BlockItem({
   const t = useT();
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id: sortId });
+  const summary = blockSummary(block);
 
   return (
     <li
@@ -327,8 +390,13 @@ function BlockItem({
           <GripVertical size={16} aria-hidden="true" />
         </button>
 
-        <span className="flex-1 text-sm font-medium">
+        <span className="flex-1 truncate text-sm font-medium">
           {t(BLOCK_LABEL_KEYS[block.type])}
+          {summary && (
+            <span className="ms-2 text-xs font-normal text-[var(--admin-text-secondary)]" dir="auto">
+              {summary}
+            </span>
+          )}
           <span className="ms-2 text-xs text-[var(--admin-text-muted)]" dir="ltr">
             #{index + 1}
           </span>

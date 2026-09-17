@@ -1,27 +1,41 @@
-import Link from 'next/link';
-
+// components/site/footer.tsx
+//
+// Renders the LITERAL markup from al-ai.ai-pages/index.html's <footer
+// id="tt-footer"> — not a Tailwind re-approximation, same reasoning as the
+// other al-ai.ai-pages components (see navbar.tsx's header comment):
+// theme-black.css only styles elements bearing these exact tt-footer-*
+// class names.
+//
+// Content split, deliberately:
+//  - Logo, site description, social links, and the "Services" column stay
+//    CMS-editable (settings.logo/siteDescription/socialLinks, and the
+//    `footer` navigation location seeded by migration/seed-al-ai-nav.ts).
+//  - The two address/phone blocks ("Partners": KSA + UAE, "Contact":
+//    Jordan + Arizona) are the source's own real company data, not
+//    generic placeholder fields the `settings` schema has room for — same
+//    reasoning as navbar.tsx's hardcoded PARTNER_BADGE_URL. If these ever
+//    need to be admin-editable, they belong in new settings columns, not
+//    guessed into existing ones.
+import Image from 'next/image';
 import type { NavItem } from './navbar';
 import type { SiteSettings } from '@/lib/db/queries';
 
-/**
- * The `locale` prop was already threaded in and never read, so these three
- * strings rendered Arabic on the English site — on every page, since the
- * footer is in the site layout.
- */
 const COPY = {
-  ar: {
-    quickLinks: 'روابط سريعة',
-    contact: 'تواصل معنا',
-    rights: 'جميع الحقوق محفوظة.',
-  },
-  en: {
-    quickLinks: 'Quick links',
-    contact: 'Contact us',
-    rights: 'All rights reserved.',
-  },
+  ar: { rights: 'جميع الحقوق محفوظة' },
+  en: { rights: 'All Rights Reserved' },
 } as const;
 
+const SOCIAL_ICONS: Record<string, string> = {
+  facebook: 'fa-facebook-f',
+  instagram: 'fa-instagram',
+  linkedin: 'fa-linkedin',
+  youtube: 'fa-youtube',
+  twitter: 'fa-x-twitter',
+  x: 'fa-x-twitter',
+};
+
 interface FooterProps {
+  /** `footer`-location nav rows — the Services column's 6 links. */
   navigation: NavItem[];
   settings: SiteSettings | null;
   locale: 'ar' | 'en';
@@ -30,54 +44,118 @@ interface FooterProps {
 export function Footer({ navigation, settings, locale }: FooterProps) {
   const currentYear = new Date().getFullYear();
   const copy = COPY[locale];
+  const social = (settings?.socialLinks ?? {}) as Partial<Record<string, string>>;
+  const socialEntries = Object.entries(social).filter(
+    (entry): entry is [string, string] => Boolean(entry[1]) && Boolean(SOCIAL_ICONS[entry[0]])
+  );
 
   return (
-    <footer className="bg-site-surface-inverted text-site-ink-inverted/70">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div className="col-span-1 md:col-span-2">
-            <h3 className="mb-4 text-xl font-bold text-site-ink-inverted">
-              {settings?.siteName ?? ''}
-            </h3>
-            <p className="max-w-sm text-sm text-site-ink-inverted/60">
-              {settings?.siteDescription || 'Content Management System'}
-            </p>
-          </div>
-
-          <div>
-            <h4 className="mb-4 text-sm font-semibold text-site-ink-inverted">{copy.quickLinks}</h4>
-            <ul className="space-y-2">
-              {navigation.map((item) => (
-                <li key={item.id}>
-                  <Link href={item.url} className="text-sm transition-colors hover:text-site-ink-inverted">
-                    {item.label}
-                  </Link>
+    <footer id="tt-footer" className="border-top max-width-1500" style={{ paddingBottom: 0 }}>
+      <div className="tt-footer-inner tt-wrap">
+        <div className="tt-row">
+          <div className="tt-col-xl-3 tt-col-sm-6">
+            <div className="tt-footer-widget">
+              <ul className="tt-footer-widget-list">
+                <li>
+                  <div className="tt-footer-logo">
+                    <a href={`/${locale}`} className="tt-magnetic-item">
+                      {settings?.logo ? (
+                        <>
+                          <Image src={settings.logo} alt={settings.siteName ?? ''} width={160} height={40} loading="lazy" className="tt-logo-light" />
+                          <Image src={settings.logo} alt={settings.siteName ?? ''} width={160} height={40} loading="lazy" className="tt-logo-dark" />
+                        </>
+                      ) : (
+                        <span className="text-xl font-bold">{settings?.siteName}</span>
+                      )}
+                    </a>
+                  </div>
                 </li>
-              ))}
-            </ul>
+                {settings?.siteDescription && (
+                  <li>
+                    <p>{settings.siteDescription}</p>
+                  </li>
+                )}
+                {socialEntries.length > 0 && (
+                  <li>
+                    <div className="tt-social-buttons">
+                      <ul>
+                        {socialEntries.map(([key, url]) => (
+                          <li key={key}>
+                            <a href={url} className="tt-magnetic-item" target="_blank" rel="noopener">
+                              <i className={`fa-brands ${SOCIAL_ICONS[key]}`} />
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </li>
+                )}
+              </ul>
+            </div>
           </div>
 
-          <div>
-            <h4 className="mb-4 text-sm font-semibold text-site-ink-inverted">{copy.contact}</h4>
-            <ul className="space-y-2 text-sm">
-              {/* dir="ltr" because a phone number is a left-to-right run, and on
-                  an Arabic page the bidi algorithm otherwise places the leading
-                  "+" per the paragraph direction — "+962 7 9000 0000" rendered
-                  as "0000 9000 7 962+". The email is Latin letters, which are
-                  strongly LTR and need no help, but it is marked for the same
-                  reason the next person will look here. */}
-              {settings?.contactEmail && (
-                <li><a dir="ltr" href={`mailto:${settings.contactEmail}`} className="inline-block hover:text-site-ink-inverted">{settings.contactEmail}</a></li>
-              )}
-              {settings?.contactPhone && (
-                <li><a dir="ltr" href={`tel:${settings.contactPhone}`} className="inline-block hover:text-site-ink-inverted">{settings.contactPhone}</a></li>
-              )}
-            </ul>
+          <div className="tt-col-xl-3 tt-col-sm-6">
+            <div className="tt-footer-widget">
+              <h5 className="tt-footer-widget-heading">Partners</h5>
+              <ul className="tt-footer-widget-list">
+                <li>Kingdom of Saudi Arabia - Riyadh - King Fahd Road, Al Olaya District</li>
+                <li><a href="tel:+966568872222" className="tt-link"> +(966) 56 887 2222</a></li>
+                <li>UAE - Office 01, Al Dana Bay, Sharm, Fujairah</li>
+                <li><a href="tel:+971566016681" className="tt-link"> +(971) 56 601 6681</a></li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="tt-col-xl-3 tt-col-sm-6">
+            <div className="tt-footer-widget">
+              <h5 className="tt-footer-widget-heading">Services</h5>
+              <ul className="tt-footer-widget-list">
+                {navigation.map((item) => (
+                  <li key={item.id}>
+                    <a className="tt-link" style={{ textTransform: 'capitalize' }} href={`/${locale}${item.url.startsWith('/') ? item.url : `/${item.url}`}`}>
+                      {item.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          <div className="tt-col-xl-3 tt-col-sm-6">
+            <div className="tt-footer-widget">
+              <h5 className="tt-footer-widget-heading">Contact</h5>
+              <ul className="tt-footer-widget-list">
+                <li>Jordan - Dabooq</li>
+                <li><a href="tel:+96265931029" className="tt-link"> +(962) 659 310 29</a></li>
+                <li>Arizona - Phoenix</li>
+                <li><a href="tel:+14807440848" className="tt-link"> +1(480) 744 0848</a></li>
+                {settings?.contactEmail && (
+                  <li>
+                    <a href={`mailto:${settings.contactEmail}`} className="tt-link" style={{ textTransform: 'capitalize' }}>
+                      {settings.contactEmail}
+                    </a>
+                  </li>
+                )}
+              </ul>
+            </div>
           </div>
         </div>
+      </div>
 
-        <div className="mt-8 border-t border-site-ink-inverted/15 pt-8 text-center text-sm text-site-ink-inverted/50">
-          © {currentYear} {settings?.siteName ?? ''}. {copy.rights}
+      <div className="tt-footer-inner tt-wrap max-width-1500 border-top" style={{ marginTop: 50 }}>
+        <div className="tt-row copyRights">
+          <div className="tt-col-xl-6 tt-col-sm-12">
+            <div className="tt-footer-widget">
+              &copy; {currentYear} {settings?.siteName ?? ''} {copy.rights}
+            </div>
+          </div>
+
+          <div className="tt-col-xl-6 tt-col-sm-12">
+            <div className="tt-footer-widget text-right">
+              <a href={`/${locale}/privacy-policy`} className="tt-link">Privacy Policy</a> |{' '}
+              <a href={`/${locale}/terms-and-conditions`} className="tt-link">Terms &amp; Conditions</a>
+            </div>
+          </div>
         </div>
       </div>
     </footer>

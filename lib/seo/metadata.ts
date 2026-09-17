@@ -29,6 +29,13 @@ export interface PageMetaInput {
   description?: string | null;
   /** Absolute or site-relative. Falls back to the site's own social image. */
   image?: string | null;
+  /**
+   * Absolute or site-relative browser-tab icon. Settings' Favicon URL field
+   * was saved to the database but nothing ever turned it into a
+   * `<link rel="icon">` — there is no app/favicon.ico or app/icon.* file
+   * either, so the tab showed no icon at all regardless of what was set here.
+   */
+  icon?: string | null;
   /** 'article' for content, 'website' otherwise. Products use 'website'. */
   type?: 'website' | 'article';
   noIndex?: boolean;
@@ -56,10 +63,12 @@ export function buildMetadata(input: PageMetaInput): Metadata {
 
   const description = input.description?.trim() || undefined;
   const image = input.image ? absoluteUrl(input.image) : undefined;
+  const icon = input.icon ? absoluteUrl(input.icon) : undefined;
 
   return {
     title: input.title,
     description,
+    icons: icon ? { icon } : undefined,
     alternates: {
       canonical: absoluteUrl(canonicalPath),
       languages,

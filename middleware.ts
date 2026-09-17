@@ -43,15 +43,27 @@ function buildCsp(nonce: string, isDev: boolean): string {
   return [
     `default-src 'self'`,
     `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${isDev ? " 'unsafe-eval'" : ''}`,
-    `style-src 'self' 'unsafe-inline'`,
+    // fonts.googleapis.com: the al-ai.ai-pages source loads Big Shoulders
+    // Display + Poppins from Google Fonts directly (a <link>, not
+    // next/font/google — "Big Shoulders Display" isn't in next/font's
+    // bundled list under Turbopack). Without this the stylesheet request
+    // itself is blocked and every tt-*/pgi-*/pcli-* heading that sets
+    // font-family: var(--tt-alter-font) silently falls back to the
+    // browser's default sans-serif instead of the real condensed display
+    // face.
+    `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
     `img-src 'self' blob: data: https:`,
-    `font-src 'self' data:`,
+    // fonts.gstatic.com serves the actual font files the stylesheet above
+    // points at.
+    `font-src 'self' data: https://fonts.gstatic.com`,
     // Analytics beacons. 'strict-dynamic' handles SCRIPT loading (a nonced
     // loader may inject further scripts), but XHR/fetch/sendBeacon targets
     // still need to be listed here or the events are silently dropped.
     `connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://connect.facebook.net https://analytics.tiktok.com https://tr.snapchat.com https://sc-static.net${isDev ? ' ws: wss:' : ''}`,
     // Video blocks embed these hosts; default-src 'self' would block them.
-    `frame-src 'self' https://www.youtube-nocookie.com https://player.vimeo.com https://www.googletagmanager.com`,
+    // *.peachworlds.com is the home page's hero (components/site/blocks/peach-hero.tsx)
+    // — the site's own interactive embed, copied verbatim from al-ai.ai-pages/index.html.
+    `frame-src 'self' https://www.youtube-nocookie.com https://player.vimeo.com https://www.googletagmanager.com https://*.peachworlds.com`,
     /**
      * 'self', not 'none': the Settings theme editor previews the real
      * storefront in an iframe, and 'none' blocks that as surely as it blocks a

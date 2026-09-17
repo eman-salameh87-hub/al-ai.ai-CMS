@@ -1,0 +1,925 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+	<head>
+
+		<!-- Title -->
+		<title>al-ai.ai | Agentic AI and multi agent systems</title>
+
+		<!-- Meta -->
+		<meta charset="utf-8">
+		<meta name="description" content="">
+		<meta name="author" content="al-ai.ai">
+
+		<!-- Open Graph -->
+		<meta property="og:type" content="website" />
+		<meta property="og:locale" content="en_EN" />
+		<meta property="og:site_name" content="al-ai.ai" />
+		<meta property="og:url" content="https://al-ai.ai/" />
+		<meta property="og:title" content="al-ai.ai" />
+		<meta property="og:description" content="The company focuses its efforts on the crucial pre-processing stage to ensure data is clean, normalized, and optimized for AI applications. This methodical approach ensures high-quality data is fed into their custom AI systems, leading to more accurate predictions and outcomes. " />
+		<meta property="og:image" content="https://al-ai.ai/assets/img/new-aeon/al-ai-ai-logo.jpg" />
+		<meta property="og:image:secure_url" content="https://al-ai.ai/assets/img/new-aeon/al-ai-ai-logo.jpg" />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+
+		<!-- Mobile Meta -->
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+		<!-- Favicon -->
+		<link rel="shortcut icon" href="assets/img/new-aeon/fav.ico">
+
+		<!-- Google fonts -->
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+		<link href="../../css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+		<link href="../../css2-1?family=Big+Shoulders+Display:wght@100..900&display=swap" rel="stylesheet">
+
+		<!-- Libs and Plugins CSS -->
+		<link rel="stylesheet" href="assets/vendor/fontawesome/css/all.min.css"> 
+		<link rel="stylesheet" href="assets/vendor/fancybox/css/fancybox.css"> 
+		<link rel="stylesheet" href="assets/vendor/swiper/css/swiper-bundle.min.css"> 
+
+		<!-- Master CSS -->
+		<link rel="stylesheet" href="assets/css/helper.css">
+		<link rel="stylesheet" href="assets/css/theme-black.css">
+
+		<style>
+			.tt-btn2 {
+				position: relative;
+				display: inline-flex;
+				align-items: center;		
+				background-color: #fff;
+				padding: 3px 15px;
+				text-transform: uppercase;
+				text-align: center;
+				font-size: 15px;
+				font-weight: 500;
+				overflow: hidden;
+				cursor: pointer;
+				letter-spacing: 0.5px;
+				border: none;
+				border-radius: 50px;
+				z-index: 9;
+			}
+
+			@media (max-width: 768px) {
+				.tt-btn2 img{
+    				width: 80px !important;
+				}
+			}
+		</style>
+
+	</head>
+
+	
+	<!-- ===========
+	///// Body /////
+	================
+	* Use class "tt-transition" to enable page transitions.
+	* Use class "tt-magic-cursor" to enable magic cursor.
+	* Use class "tt-noise" to enable the background noise effect on the whole page. 
+	* Use class "tt-smooth-scroll" to enable page smooth scroll. 
+	* Use class "tt-lightmode-default" to enable light style by default (you must clear your browser's cookies and cache first!).
+	* Note: there may be classes that are specific to this page only!
+	-->
+	<body id="body" class="tt-transition tt-noise tt-magic-cursor tt-smooth-scroll">
+
+
+		<!-- *************************************
+		*********** Begin body inner ************* 
+		************************************** -->
+		<main id="body-inner">
+
+
+			<!-- Begin page transition (do not remove!!!) 
+			=========================== -->
+			<div id="tt-page-transition">
+				<div class="tt-ptr-overlay-top tt-noise"></div>
+				<div class="tt-ptr-overlay-bottom tt-noise"></div>
+				<div class="tt-ptr-preloader">
+					<div class="tt-ptr-prel-content">
+						<!-- Hint: You may need to change the img height and opacity to match your logo type. You can do this from the "theme.css" file (find: ".tt-ptr-prel-image"). -->
+						<img src="assets/img/logo-light.png" class="tt-ptr-prel-image" alt="Logo">
+					</div> <!-- /.tt-ptr-prel-content -->
+				</div> <!-- /.tt-ptr-preloader -->
+			</div>
+			<!-- End page transition -->
+
+			<!-- Begin magic cursor 
+			======================== -->
+			<div id="magic-cursor">
+				<div id="ball"></div>
+			</div>
+			<!-- End magic cursor --> 
+
+			<!-- ===================
+			///// Begin header /////
+			========================
+			* Use class "tt-header-scroll" to hide header on scroll down and show on scroll up.
+			* Use class "tt-header-fixed" to set header to fixed position (no effect with class "tt-header-scroll").
+			* Use class "tt-header-filled" to add background color to header on scroll (effect only with class "tt-header-scroll" and "tt-header-fixed").
+			* Use class "tt-header-alter" to enable alternative layout (for desktop only!).
+			-->
+			<header id="tt-header" class="tt-header-alter tt-header-scroll tt-header-filled">
+				<div class="tt-header-inner tt-noise"> 
+
+					<div class="tt-header-col tt-header-col-left">
+
+						<!-- Begin logo 
+						================ 
+						Hint: You may need to change the img height to match your logo type. You can do this from the "theme.css" file (find: ".tt-logo img").
+						-->
+						<div class="tt-logo"> 
+							<a href="index.html" class="tt-magnetic-item">
+								<img src="assets/img/logo-light.png" class="tt-logo-light" alt="Logo"> <!-- logo light -->
+								<img src="assets/img/logo-dark.png" class="tt-logo-dark" alt="Logo"> <!-- logo dark -->
+							</a>
+						</div>
+						<!-- End logo -->
+
+					</div> <!-- /.tt-header-col -->
+
+					<div class="tt-header-col tt-header-col-center">
+
+						<!-- Begin main menu (classic)
+						===============================
+						* Use class "tt-m-menu-center" to align mobile menu to center.
+						-->
+						<nav class="tt-main-menu tt-m-menu-center">
+							<div class="tt-main-menu-holder">
+								<div class="tt-main-menu-inner">
+									<div class="tt-main-menu-content">
+
+										<ul class="tt-main-menu-list">
+
+											<li>
+												<a href="index.html">Home</a>
+											</li>
+
+											<li>
+												<a href="about.html">About</a>
+											</li>
+
+											<li class="tt-submenu-wrap tt-submenu-master active">
+												<div class="tt-submenu-trigger">
+													<a href="services.html">Services</a>
+												</div> 
+												<div class="tt-submenu">
+													<ul class="tt-submenu-list">
+
+														<li><a href="data-driven.html">Data Driven</a></li>
+														<li><a href="agentic-AI-and-multi-agent-systems.html">Agentic AI & Multi-Agent Systems </a></li>
+														<li><a href="conversational-and-edge-analytics.html">Conversational & Edge Analytics</a></li>
+														<li><a href="automated-decision-making-and-BPA.html">Automated Decision-Making & BPA </a></li>
+														<li><a href="polarization-and-pre-indoctrination.html">Polarization & Indoctrination​  </a></li>						
+														<li><a href="behavioral-intelligence.html">Behavioral Intelligence</a></li>
+							
+													</ul> 
+												</div> 
+											</li>
+
+											<li>
+												<a href="contact.html">Contact</a>
+											</li>
+
+										</ul>
+
+									</div> <!-- /.tt-main-menu-content -->
+								</div> <!-- /.tt-main-menu-inner -->
+							</div> <!-- /.tt-main-menu-holder -->
+
+						</nav> 
+						<!-- End main menu -->
+
+					</div> <!-- /.tt-header-col -->
+
+					<div class="tt-header-col tt-header-col-right">
+
+						<!-- Begin mobile menu toggle button (for "tt-main-menu") --> 
+						<div id="tt-m-menu-toggle-btn-wrap">
+							<div class="tt-m-menu-toggle-btn-text">
+								<span class="tt-m-menu-text-menu">Menu</span>
+								<span class="tt-m-menu-text-close">Close</span>
+							</div>
+							<div class="tt-m-menu-toggle-btn-holder">
+								<a href="#" class="tt-m-menu-toggle-btn"><span></span></a>
+							</div>
+						</div>
+						<!-- End mobile menu toggle button -->
+
+						<!-- Begin header button (hidden on small screens!) -->
+						<a href="contact.html" class="tt-btn tt-btn-secondary hide-from-xlg tt-magnetic-item">
+							<span data-hover="Contact">Contact</span>
+						</a>
+						<!-- End header button -->
+
+						<!-- Begin style switch button -->
+						<div class="tt-style-switch">
+							<div class="tt-style-switch-inner tt-magnetic-item">
+								<div class="tt-stsw-light">
+									<i class="fas fa-sun"></i>
+								</div>
+								<div class="tt-stsw-dark">
+									<i class="fas fa-moon"></i>
+								</div>
+							</div>
+						</div>
+						<!-- End style switch button -->
+
+					</div> <!-- /.header-col -->
+				</div> <!-- /.header-inner -->
+			</header>
+			<!-- End header -->
+
+			
+			<!-- *************************************
+			*********** Begin content wrap *********** 
+			************************************** -->
+			<div id="tt-content-wrap">
+
+				
+				<!-- ========================
+				///// Begin page header /////
+				============================= 
+				* Use class "ph-full" to enable fullscreen size (no effect on small screens!).
+				* Use class "ph-full-m" to enable fullscreen size on small screens.
+				* Use class "ph-cap-sm", "ph-cap-lg", "ph-cap-xlg", "ph-cap-xxlg" "ph-cap-xxxlg" or "ph-cap-xxxxlg" to set caption size (no class = default size).
+				* Use class "ph-center" to align the content to the center. 
+				* Use class "ph-caption-parallax" to enable caption parallax.
+				* Use class "ph-image-parallax" to enable image/video parallax (if image/video exist).
+				* Use class "ph-bg-is-light" if needed, it makes the elements dark and more visible if you use a very light background image (effect only if the image/video exist).
+				-->
+				<div id="page-header" class="ph-cap-lg ph-image-parallax ph-caption-parallax">
+
+					<!-- Begin page header image 
+					============================= 
+					* Use class "ph-image-grayscale" to enable black & white image.
+					* Use class "ph-image-cover-*" to set image overlay opacity. For example "ph-image-cover-2" or "ph-image-cover-2-5" (up to "ph-image-cover-9-5"). 
+					-->
+					<div class="ph-image ph-image-cover-5">
+						<div class="ph-image-inner">
+							<video autoplay muted loop playsinline webkit-playsinline preload="auto">
+								<source src="assets/img/new-aeon/bg-brain2.mp4" type="video/mp4">
+							</video>
+						</div>
+					</div>
+					<!-- End page header image -->
+
+					<!-- Begin page header video 
+					============================= 
+					* Use class "ph-video-grayscale" to enable black & white video.
+					* Use class "ph-video-cover-*" to set video overlay opacity. For example "ph-video-cover-2" or "ph-video-cover-2-5" (up to "ph-video-cover-9-5"). 
+					* Use attribute "loop" in <video> tag to make the video play repeatedly.
+					-->
+					<!-- <div class="ph-video ph-video-cover-1">
+						<div class="ph-video-inner">
+							<video loop muted autoplay playsinline preload="metadata" poster="assets/vids/1920/video-1-1920.jpg">
+								<source src="assets/vids/placeholder.mp4" data-src="assets/vids/1920/video-1-1920.mp4" type="video/mp4">
+								<source src="assets/vids/placeholder.webm" data-src="assets/vids/1920/video-1-1920.webm" type="video/webm">
+							</video>
+						</div>
+					</div> -->
+					<!-- End page header video -->
+						
+					<div class="page-header-inner tt-wrap">
+
+						<div class="ph-caption">
+							<div class="ph-caption-inner">
+								<div class="ph-caption-categories">
+									<a href="blog-archive.html" class="ph-caption-category">Lifestyle</a>
+									<!-- <a href="blog-archive.html" class="ph-caption-category">Uncategorized</a> -->
+								</div> <!-- /.ph-categories -->
+								<h1 class="ph-caption-title">5 Surprising Techniques to Improve Your Creativity</h1>
+								<div class="ph-caption-meta">
+									<span class="ph-cap-meta-published">February 26, 2025</span>
+									<span class="ph-cap-meta-posted-by">by: <a href="blog-archive.html" title="View all posts by John Doe">John Doe</a></span>
+								</div> <!-- /.ph-meta -->
+							</div> <!-- /.ph-caption-inner -->
+						</div> <!-- /.ph-caption -->
+
+					</div> <!-- /.page-header-inner -->
+
+
+					<!-- Begin page header share (share buttons are for design purposes only!) 
+					============================= -->
+					<div class="ph-share">
+						<div class="ph-share-inner">
+							<div class="ph-share-trigger">
+								<div class="ph-share-text">Share</div>
+								<div class="ph-share-icon"><i class="fas fa-share"></i></div>
+							</div> <!-- /.ph-share-trigger -->
+							<div class="ph-share-buttons">
+								<ul>
+									<li><a href="" class="tt-magnetic-item" title="Share on Facebook"><i class="fa-brands fa-facebook-f"></i></a></li>
+									<li><a href="" class="tt-magnetic-item" title="Share on X"><i class="fa-brands fa-x-twitter"></i></a></li>
+									<li><a href="" class="tt-magnetic-item" title="Share on Pinterest"><i class="fa-brands fa-pinterest"></i></a></li>
+								</ul>
+							</div> <!-- /.ph-share-buttons -->
+						</div> <!-- /.ph-share-inner -->
+					</div>
+					<!-- End page header share -->
+
+					<!-- Begin scroll down
+					=======================
+					* Note: Circle shown only if class "ph-full" or "ph-full-m" is enabled in "page-header" but not on small screens! Otherwise, only the arrow icon will be shown to save space.
+					-->
+					<div class="tt-scroll-down">
+						<!-- You can change "data-offset" attribute to set scroll top offset -->
+						<a href="#tt-page-content" class="tt-scroll-down-inner tt-magnetic-item" data-offset="0">
+							<div class="tt-scrd-icon"></div>
+							<svg viewbox="0 0 500 500">
+								<defs>
+									<path d="M50,250c0-110.5,89.5-200,200-200s200,89.5,200,200s-89.5,200-200,200S50,360.5,50,250" id="textcircle"></path>
+								</defs>
+								<text dy="30">
+									<!-- If you change the text, you probably have to change the CSS parameters as well. In the "theme.css" file, find ".tt-scroll-down text {" and change the "font-size" and "letter-spacing" to fit the text correctly. -->
+									<textpath xlink:href="#textcircle">Scroll to Explore - Scroll to Explore -</textpath>
+								</text>
+							</svg>
+						</a> <!-- /.tt-scroll-down-inner -->
+					</div>
+					<!-- End scroll down -->
+
+				</div>
+				<!-- End page header -->
+
+
+				<!-- *************************************
+				*********** Begin page content *********** 
+				************************************** -->
+				<div id="tt-page-content">
+
+
+					<!-- =======================
+					///// Begin tt-section /////
+					============================ 
+					* You can use padding classes if needed. For example "padding-top-xlg-150", "padding-bottom-xlg-150", "no-padding-top", "no-padding-bottom", etc.
+					* You can use classes "border-top" and "border-bottom" if needed. 
+					* Note: Each situation may be different and each section may need different classes according to your needs. More info about helper classes can be found in the file "helper.css".
+					-->
+					<div class="tt-section padding-top-xlg-120 padding-bottom-xlg-120">
+						<div class="tt-section-inner tt-wrap">
+
+							<!-- Use class "tt-lg-row-reverse" to align sidebar to the left -->
+							<div class="tt-row">
+
+								<!-- Content column -->
+								<div class="tt-col-lg-8">
+
+									<!-- Begin blog post 
+									===================== -->
+									<article class="tt-blog-post">
+
+										<!-- Begin blog post content -->
+										<div class="tt-blog-post-content">
+
+											<p class="text-lg">This is a creative portfolio showcase HTML website template. Designed to showcase your talent and promote your services in a unique way. Attachment apartments in delightful by motionless it no. And now she burst sir learn total.</p>
+
+											<p>Manor we shall merit by chief wound no or would. Oh towards between subject passage sending mention or it. Sight happy do burst fruit to woody begin at. Assurance perpetual he in oh determine as. The year paid met him does eyes same. Own marianne improved sociable not out. Thing do sight blush mr an. Celebrated am announcing delightful remarkably we in literature it solicitude. Design use say piqued any gay supply.</p>
+
+											<br>
+
+											<h4>Heading</h4>
+
+											<p>Eat imagine you chiefly few end ferrars compass. Be visitor females am ferrars inquiry. Latter law remark two lively thrown. Spot set they know rest its. Raptures law diverted believed jennings consider children the see. Had invited beloved carried the colonel. Occasional principles discretion it as he unpleasing boisterous.</p>
+
+											<img src="assets/img/blog/1200/blog-post-1-1200.jpg" class="tt-blog-post-image" loading="lazy" alt="Image">
+
+											<p>Offices parties lasting outward nothing age few resolve. Impression to discretion understood to we interested he excellence. Him remarkably use projection collecting. Going about eat forty world has round miles. Attention affection at my preferred offending shameless me if agreeable. Life lain held calm and true neat she. Much feet each so went no from. Truth began maids linen an mr to after.</p>
+
+											<!-- Begin blockquote 
+											======================
+											* Use class "open-quote" to enable quotation marks.
+											-->
+											<blockquote class="open-quote">
+												<cite>Your time is limited, so don't waste it living someone else's life. Don't be trapped by dogma – which is living with the results of other people's thinking.</cite>
+												<footer><cite title="Source Title">Steve Jobs</cite></footer>
+											</blockquote>
+											<!-- End blockquote -->
+
+											<p>Ladyship it daughter securing procured or am moreover mr. Put sir she exercise vicinity cheerful wondered. Continual say suspicion provision you neglected sir curiosity unwilling. Simplicity end themselves increasing led day sympathize yet. General windows effects not are drawing man garrets. Common indeed garden you his ladies out yet. Preference imprudence contrasted to remarkably in on. Taken now you him trees tears any. Her object giving end sister except oppose.</p>
+
+										</div>
+										<!-- End blog post content -->
+
+										<!-- Begin blog post tags -->
+										<div class="tt-blog-post-tags">
+											<ul>
+												<li><span>Tags:</span></li>
+												<li><a href="blog-archive.html">#photography</a></li> 
+												<li><a href="blog-archive.html">#travel</a></li>
+												<li><a href="blog-archive.html">#motion</a></li>
+											</ul>
+										</div>
+										<!-- End blog post tags -->
+
+										<!-- Begin blog post share (Note: Share buttons are for design purposes only!) 
+										=========================== -->
+										<div class="tt-blog-post-share">
+											<div class="tt-bps-text">Share:</div>
+											<div class="tt-social-buttons">
+												<ul>
+													<li><a href="#0" class="tt-magnetic-item" title="Share on Facebook"><i class="fa-brands fa-facebook-f"></i></a></li>
+													<li><a href="#0" class="tt-magnetic-item" title="Share on Twitter"><i class="fa-brands fa-x-twitter"></i></a></li>
+													<li><a href="#0" class="tt-magnetic-item" title="Share on Pinterest"><i class="fa-brands fa-pinterest"></i></a></li>
+												</ul>
+											</div> <!-- /.social-buttons -->
+										</div>
+										<!-- End blog post share -->
+
+									</article> 
+									<!-- End blog post -->
+
+
+									<!-- Begin blog post nav 
+									======================== -->
+									<div class="tt-blog-post-nav">
+										<div class="tt-bp-nav-col tt-bp-nav-left">
+											<div class="tt-bp-nav-text"><a href=""><span><i class="fa-solid fa-arrow-left"></i></span>Prew Post</a></div>
+											<h4 class="tt-bp-nav-title"><a href="">Secrets to Getting Your Project to Complete Quickly</a></h4>
+										</div>
+										<div class="tt-bp-nav-col tt-bp-nav-right">
+											<div class="tt-bp-nav-text"><a href="">Next Post<span><i class="fa-solid fa-arrow-right"></i></span></a></div>
+											<h4 class="tt-bp-nav-title"><a href="">Why Some People Save Money With This Method</a></h4>
+										</div>
+									</div>
+									<!-- End blog post nav -->
+
+
+									<!-- Begin post comments 
+									========================= -->
+									<div id="tt-blog-post-comments">
+
+										<h4 class="tt-bpc-heading">5 comments:</h4>
+										
+										<!-- Begin tt-Comments list 
+										============================ -->
+										<ul class="tt-comments-list">
+
+											<!-- Begin tt-comment -->
+											<li class="tt-comment">
+												<a href="#" class="tt-comment-avatar">
+													<img src="assets/img/blog/avatar.png" loading="lazy" alt="image">
+												</a>
+												<div class="tt-comment-body">
+													<div class="tt-comment-meta">
+														<h4 class="tt-comment-heading"><a href="#0">David Bradley</a></h4>
+														<span class="tt-comment-time">February 26, 2025 at 10:24am</span>
+													</div>
+													<span class="tt-comment-reply"><a href="#0">Reply</a></span>
+													<div class="tt-comment-text">
+														<p>Tolerably earnestly middleton extremely distrusts she boy now not. Add and offered prepare how cordial two promise. Greatly who affixed suppose but enquire compact prepare all put. Added forth chief trees but rooms think may. Wicket do manner others seemed enable rather in. Excellent own discovery unfeeling.</p>
+													</div> <!-- /.tt-comment-text -->
+												</div> <!-- /.tt-comment-body -->
+											</li>
+											<!-- End tt-comment -->
+
+											<!-- Begin tt-comment -->
+											<li class="tt-comment">
+												<a href="#" class="tt-comment-avatar">
+													<img src="assets/img/blog/avatar.png" loading="lazy" alt="image">
+												</a>
+												<div class="tt-comment-body">
+													<div class="tt-comment-meta">
+														<h4 class="tt-comment-heading"><a href="#0">Katie Ryan</a></h4>
+														<span class="tt-comment-time">February 26, 2025 at 10:24am</span>
+													</div>
+													<span class="tt-comment-reply"><a href="#0">Reply</a></span>
+													<div class="tt-comment-text">
+														<p>Unfeeling so rapturous discovery he exquisite. Reasonably so middletons or impression by terminated. Old pleasure required removing elegance him had. Down she bore sing saw calm high. Of an or game gate west face shed. ﻿no great but music too old found arose.</p>
+													</div> <!-- /.tt-comment-text -->
+
+													<!-- Begin tt comments list 
+													============================ -->
+													<ul class="tt-comments-list">
+
+														<!-- Begin tt-comment -->
+														<li class="tt-comment">
+															<a href="#" class="tt-comment-avatar">
+																<img src="assets/img/blog/avatar.png" loading="lazy" alt="image">
+															</a>
+															<div class="tt-comment-body">
+																<div class="tt-comment-meta">
+																	<h4 class="tt-comment-heading"><a href="#0">John Doe</a></h4>
+																	<span class="tt-comment-time">February 26, 2025 at 10:24am</span>
+																</div>
+																<span class="tt-comment-reply"><a href="#0">Reply</a></span>
+																<div class="tt-comment-text">
+																	<p>Still court no small think death so an wrote. Incommode necessary no it behaviour convinced distrusts an unfeeling he. Could death since do we hoped is in. Exquisite no my attention extensive. The determine conveying moonlight age. Avoid for see marry sorry child.</p>
+																</div> <!-- /.tt-comment-text -->
+															</div> <!-- /.tt-comment-body -->
+														</li>
+														<!-- End tt-comment -->
+
+														<!-- Begin tt-comment -->
+														<li class="tt-comment">
+															<a href="#" class="tt-comment-avatar">
+																<img src="assets/img/blog/avatar.png" loading="lazy" alt="image">
+															</a>
+															<div class="tt-comment-body">
+																<div class="tt-comment-meta">
+																	<h4 class="tt-comment-heading"><a href="#0">Katie Ryan</a></h4>
+																	<span class="tt-comment-time">February 26, 2025 at 10:24am</span>
+																</div>
+																<span class="tt-comment-reply"><a href="#0">Reply</a></span>
+																<div class="tt-comment-text">
+																	<p>For norland produce age wishing. To figure on it spring season up. Her provision acuteness had excellent two why intention.</p>
+																</div> <!-- /.tt-comment-text -->
+															</div> <!-- /.tt-comment-body -->
+														</li>
+														<!-- End tt-comment -->
+
+													</ul>
+													<!-- End tt comments list -->
+
+												</div> <!-- /.tt-comment-body -->
+											</li>
+											<!-- End tt-comment -->
+
+											<!-- Begin tt-comment -->
+											<li class="tt-comment">
+												<a href="#" class="tt-comment-avatar">
+													<img src="assets/img/blog/avatar.png" loading="lazy" alt="image">
+												</a>
+												<div class="tt-comment-body">
+													<div class="tt-comment-meta">
+														<h4 class="tt-comment-heading"><a href="#0">Kate Dixon</a></h4>
+														<span class="tt-comment-time">February 26, 2025 at 10:24am</span>
+													</div>
+													<span class="tt-comment-reply"><a href="#0">Reply</a></span>
+													<div class="tt-comment-text">
+														<p>Allow miles wound place the leave had. To sitting subject no improve studied limited. Ye indulgence unreserved connection alteration appearance my an astonished. Up as seen sent make he they of.</p>
+													</div> <!-- /.tt-comment-text -->
+												</div> <!-- /.tt-comment-body -->
+											</li>
+											<!-- End tt-comment -->
+
+										</ul>
+										<!-- End tt-Comments list -->
+
+										<!-- Begin form 
+										================ 
+										* Use class "tt-form-filled", "tt-form-minimal" or "tt-form-creative" to change form style.
+										* Use class "tt-form-sm" or "tt-form-lg" to change form size (no class = default size).
+										-->
+										<form id="tt-post-comment-form">
+											<h4 class="tt-post-comment-form-heading">Leave a Comment:</h4>
+											<small class="tt-form-text">Fields marked with an asterisk (*) are required!</small>
+											<br>
+											<br>
+											<div class="tt-row">
+												<div class="tt-col-lg-6">
+
+													<div class="tt-form-group">
+														<label>Name <span class="required">*</span></label>
+														<input class="tt-form-control" id="84990245" type="text" placeholder="" required="">
+													</div>
+
+												</div> <!-- /.col -->
+
+												<div class="tt-col-lg-6">
+
+													<div class="tt-form-group">
+														<label>Email address <span class="small text-gray">(Optional)</span></label>
+														<input class="tt-form-control" id="19833520" type="email" placeholder="">
+													</div>
+
+												</div> <!-- /.col -->
+											</div> <!-- /.row -->
+											
+											<div class="tt-form-group">
+												<label>Comment <span class="required">*</span></label>
+												<textarea class="tt-form-control" id="30945381" rows="6" placeholder="" required=""></textarea>
+											</div>
+
+											<!-- Begin post comment reminder -->
+											<div class="tt-post-comment-reminder">
+												<div class="tt-form-check tt-form-check-inline">
+													<input type="checkbox" id="notify-me-new-comment">
+													<label for="notify-me-new-comment">Email me when this comment receives a reply.</label>
+												</div>
+												<div class="tt-form-check">
+													<input type="checkbox" id="notify-me-new-post">
+													<label for="notify-me-new-post">Notify me of new posts by email.</label>
+												</div>
+											</div>
+											<!-- End post comment reminder -->
+
+											<!-- Begin post comment submit button -->
+											<button type="submit" class="tt-btn tt-btn-primary margin-top-30">
+												<span data-hover="Post Comment">Post Comment</span>
+											</button>
+											<!-- End post comment submit button -->
+
+										</form>
+										<!-- End post comment form -->
+
+									</div>
+									<!-- End post comments -->
+
+								</div> <!-- /.col (Content column) -->
+
+								<!-- Sidebar column -->
+								<div class="tt-col-lg-4">
+
+									<!-- Begin sidebar (classic) 
+									============================= 
+									Note: add class "tt-lg-row-reverse" to "tt-row" above to align sidebar to the left.
+									-->
+									<div class="tt-sidebar">
+										
+										<!-- Begin sidebar widget -->
+										<div class="sidebar-widget sidebar-search">
+											<h3 class="sidebar-heading">Search</h3>
+											
+											<!-- Begin form (Note: for design purposes only!)
+											================ 
+											* Use class "tt-form-filled" or "tt-form-minimal" to change form style.
+											* Use class "tt-form-sm" or "tt-form-lg" to change form size (no class = default size).
+											-->
+											<form>
+												<div class="tt-form-btn-inside">
+													<input class="tt-form-control" type="text" id="search" placeholder="Type something & hit enter" required="">
+													<button type="submit"><i class="fas fa-search"></i></button>
+												</div>
+											</form>
+											<!-- End form -->
+
+										</div> 
+										<!-- End sidebar widget -->
+
+										<!-- Begin sidebar widget -->
+										<div class="sidebar-widget sidebar-categories">
+											<h3 class="sidebar-heading">Categories</h3>
+											<ul class="list-unstyled">
+												<li><a href="blog-archive.html">Lifestyle <span title="Entries in this category">26</span></a></li>
+												<li><a href="blog-archive.html">Resources <span title="Entries in this category">12</span></a></li>
+												<li><a href="blog-archive.html">Tutorials <span title="Entries in this category">19</span></a></li>
+												<li><a href="blog-archive.html">Freebies <span title="Entries in this category">31</span></a></li>
+												<li><a href="blog-archive.html">Inspiration <span title="Entries in this category">67</span></a></li>
+											</ul>
+										</div>
+										<!-- End sidebar widget -->
+
+										<!-- Begin sidebar widget -->
+										<div class="sidebar-widget sidebar-post-list">
+											<!-- Can be "Recent Posts" or "Popular Posts" etc. -->
+											<h3 class="sidebar-heading">Popular Posts</h3>
+											<ul class="list-unstyled">
+												<li>
+													<div class="sidebar-post-data">
+														<h5 class="sidebar-post-title"><a href="">Why Some People Save Money With This Method</a></h5>
+														<!-- <span class="sidebar-post-author">By: <a href="">John Doe</a></span> -->
+														<span class="sidebar-post-date">May 14, 2021</span>
+													</div>
+												</li>
+												<li>
+													<div class="sidebar-post-data">
+														<h5 class="sidebar-post-title"><a href="">Want to Step Up Your Skills? You Need to Read This First</a></h5>
+														<!-- <span class="sidebar-post-author">By: <a href="">John Doe</a></span> -->
+														<span class="sidebar-post-date">May 12, 2021</span>
+													</div>
+												</li>
+												<li>
+													<div class="sidebar-post-data">
+														<h5 class="sidebar-post-title"><a href="">Secrets to Getting Your Project to Complete Quickly</a></h5>
+														<!-- <span class="sidebar-post-author">By: <a href="">Henry Harrison</a></span> -->
+														<span class="sidebar-post-date">May 17, 2021</span>
+													</div>
+												</li>
+												<li>
+													<div class="sidebar-post-data">
+														<h5 class="sidebar-post-title"><a href="">How to Win Friends and Influence People?</a></h5>
+														<!-- <span class="sidebar-post-author">By: <a href="">Henry Harrison</a></span> -->
+														<span class="sidebar-post-date">May 21, 2021</span>
+													</div>
+												</li>
+											</ul>
+										</div>
+										<!-- End sidebar widget -->
+
+										<!-- Begin sidebar widget -->
+										<div class="sidebar-widget sidebar-comments-list">
+											<h3 class="sidebar-heading">Recent Comments</h3>
+											<ul class="list-unstyled">
+												<li class="sidebar-comment">
+													<div class="sidebar-comment-meta">
+														<div class="sidebar-comment-data">
+															<span class="sidebar-comment-author"><a href="">John Doe</a></span>
+															<span class="sidebar-comment-date">May 14, 2021</span>
+														</div>
+													</div>
+													<div class="sidebar-comment-text">
+														<a href="">Aliquet praesent tempor ac dolor aliquet. Risus mi vitae hendrerit orci vitae amet lacus tertis ...</a>
+													</div>
+												</li>
+
+												<li class="sidebar-comment">
+													<div class="sidebar-comment-meta">
+														<div class="sidebar-comment-data">
+															<span class="sidebar-comment-author"><a href="">David Bradley</a></span>
+															<span class="sidebar-comment-date">May 14, 2021</span>
+														</div>
+													</div>
+													<div class="sidebar-comment-text">
+														<a href="">Laculis molestie rhoncus. Amet maecenas ut orci id dui. Et dui morbi. Non mauris nautis trettis ...</a>
+													</div>
+												</li>
+
+												<li class="sidebar-comment">
+													<div class="sidebar-comment-meta">
+														<div class="sidebar-comment-data">
+															<span class="sidebar-comment-author"><a href="">Kate Dixon</a></span>
+															<span class="sidebar-comment-date">May 14, 2021</span>
+														</div>
+													</div>
+													<div class="sidebar-comment-text">
+														<a href="">Feugiat fringilla sequi. Anunc adipiscing nisl lorem morbi tincidunt gravida vistrim nocktac fitset ...</a>
+													</div>
+												</li>
+											</ul>
+										</div>
+										<!-- End sidebar widget -->
+
+										<!-- Begin sidebar widget -->
+										<div class="sidebar-widget sidebar-tags">
+											<h3 class="sidebar-heading">Tags</h3>
+											<div class="sidebar-tags-list">
+												<ul>
+													<li><a href="blog-archive.html">#portfolio</a></li>
+													<li><a href="blog-archive.html">#multipurpose</a></li>
+													<li><a href="blog-archive.html">#minimal</a></li>
+													<li><a href="blog-archive.html">#agency</a></li>
+													<li><a href="blog-archive.html">#creatives</a></li>
+													<li><a href="blog-archive.html">#freelancers</a></li>
+													<li><a href="blog-archive.html">#design</a></li>
+													<li><a href="blog-archive.html">#bootstrap</a></li>
+													<li><a href="blog-archive.html">#responsive</a></li>
+													<li><a href="blog-archive.html">#simple</a></li>
+													<li><a href="blog-archive.html">#creative</a></li>
+													<li><a href="blog-archive.html">#blog</a></li>
+													<li><a href="blog-archive.html">#wordpress</a></li>
+													<li><a href="blog-archive.html">#black &amp; white</a></li>
+												</ul>
+											</div> <!-- /.sidebar-tags-list -->
+										</div>
+										<!-- End sidebar widget -->
+
+										<!-- Begin sidebar widget -->
+										<div class="sidebar-widget sidebar-meta">
+											<h3 class="sidebar-heading">Meta</h3>
+											<ul class="list-unstyled">
+												<li><a href="">Log In</a></li>
+												<li><a href="">Entries RSS</a></li>
+												<li><a href="">Comments RSS</a></li>
+												<li><a href="https://themetorium.net" target="_blank" rel="noopener" class="tt-link">Themetorium.net</a></li>
+											</ul>
+										</div>
+										<!-- End sidebar widget -->
+
+									</div>
+									<!-- End sidebar (classic) -->
+
+								</div> <!-- /.col -->
+							</div> <!-- /.row -->
+
+						</div> <!-- /.tt-section-inner -->
+					</div>
+					<!-- End tt-section -->
+
+
+				</div>
+				<!-- End page content -->
+
+
+				<!-- ======================
+				///// Begin tt-footer /////
+				=========================== -->
+				<footer id="tt-footer" class="border-top">
+					<div class="tt-footer-inner tt-wrap">
+
+						<div class="tt-row">
+							<div class="tt-col-xl-3 tt-col-sm-6">
+								<div class="tt-footer-widget">
+									<h5 class="tt-footer-widget-heading">Links</h5>
+									<ul class="tt-footer-widget-list">
+										<li><a href="dummy.html" class="tt-link">Support</a></li>
+										<li><a href="dummy.html" class="tt-link">Licenses</a></li>
+										<li><a href="dummy.html" class="tt-link">Terms of Use</a></li>
+										<li><a href="dummy.html" class="tt-link">Privacy Policy</a></li>
+									</ul> <!-- /.tt-footer-widget-list -->
+								</div> <!-- /.tt-footer-widget -->
+							</div> <!-- /.tt-col -->
+
+							<div class="tt-col-xl-3 tt-col-sm-6">
+								<div class="tt-footer-widget">
+									<h5 class="tt-footer-widget-heading">Sitemap</h5>
+									<ul class="tt-footer-widget-list">
+										<li><a href="about-me.html" class="tt-link">About Me</a></li>
+										<li><a href="portfolio.html" class="tt-link">My Work</a></li>
+										<li><a href="services.html" class="tt-link">Services</a></li>
+										<li><a href="contact.html" class="tt-link">Contact</a></li>
+									</ul> <!-- /.tt-footer-widget-list -->
+								</div> <!-- /.tt-footer-widget -->
+							</div> <!-- /.tt-col -->
+
+							<div class="tt-col-xl-3 tt-col-sm-6">
+								<div class="tt-footer-widget">
+									<h5 class="tt-footer-widget-heading">Contact</h5>
+									<ul class="tt-footer-widget-list">
+										<li>
+											<a href="https://www.google.com/maps/place/121+King+St,+Melbourne+VIC+3000,+Austraalia/@-37.817251,144.955775,17z/data=!3m1!4b1!4m6!3m5!1s0x6ad65d4dd5a05d97:0x3e64f855a564844d!8m2!3d-37.817251!4d144.955775!16s%2Fg%2F11g0g8c54h" class="tt-link" target="_blank" rel="nofollow noopener">121 King Street,<br> Melbourne, Australia</a>
+										</li>
+										<li><a href="mailto:company@email.com" class="tt-link">company@email.com</a></li>
+										<li><a href="tel:+(123)456789000" class="tt-link"> +(123) 456 789 000</a></li>
+										<li>
+											<div class="tt-social-buttons">
+												<ul>
+													<li><a href="https://www.facebook.com/themetorium" class="tt-magnetic-item" target="_blank" rel="noopener"><i class="fa-brands fa-facebook-f"></i></a></li>
+													<li><a href="https://dribbble.com/Themetorium" class="tt-magnetic-item" target="_blank" rel="noopener"><i class="fa-brands fa-dribbble"></i></a></li>
+													<li><a href="https://www.behance.net/Themetorium" class="tt-magnetic-item" target="_blank" rel="noopener"><i class="fa-brands fa-behance"></i></a></li>
+													<li><a href="https://www.youtube.com/" class="tt-magnetic-item" target="_blank" rel="noopener"><i class="fa-brands fa-youtube"></i></a></li>
+													<!-- <li><a href="https://x.com/Themetorium" class="tt-magnetic-item" target="_blank" rel="noopener"><i class="fa-brands fa-x-twitter"></i></a></li> -->
+												</ul>
+											</div> <!-- /.tt-social-buttons -->
+										</li>
+									</ul> <!-- /.tt-footer-widget-list -->
+								</div> <!-- /.tt-footer-widget -->
+							</div> <!-- /.tt-col -->
+
+							<div class="tt-col-xl-3 tt-col-sm-6 tt-justify-content-xl-end">
+								<div class="tt-footer-widget">
+									<ul class="tt-footer-widget-list">
+										<li>
+											<!-- You may need to change the img height to match your logo type. You can do this from the "theme.css" file (find: ".tt-footer-logo img").-->
+											<div class="tt-footer-logo"> 
+												<a href="index.html" class="tt-magnetic-item">
+													<img src="assets/img/logo-light.png" class="tt-logo-light" loading="lazy" alt="Logo"> <!-- logo light -->
+													<img src="assets/img/logo-dark.png" class="tt-logo-dark" loading="lazy" alt="Logo"> <!-- logo dark -->
+												</a>
+											</div> <!-- /.tt-footer-logo -->  
+										</li>
+										<li>
+											<div class="tt-footer-copyright">
+												© <span class="tt-copyright-year"></span> <a href="https://themetorium.net/" class="tt-link" target="_blank" rel="nofollow noopener"> Themetorium.net</a><br> 
+												All Rights Reserved
+											</div> <!-- /.tt-footer-copyright -->
+										</li>
+									</ul> <!-- /.tt-footer-widget-list -->
+								</div> <!-- /.tt-footer-widget -->
+							</div> <!-- /.tt-col -->
+						</div> <!-- /.tt-row -->
+
+					</div> <!-- /.tt-section-inner -->
+				</footer>
+				<!-- End tt-footer -->
+
+
+				<!-- Begin scroll to top button
+				================================ -->
+				<a href="#" class="tt-scroll-to-top">
+					<div class="tt-stt-progress tt-magnetic-item">
+						<svg class="tt-stt-progress-circle" width="100%" height="100%" viewbox="-1 -1 102 102">
+							<path d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98"></path>
+						</svg>
+					</div> <!-- /.tt-stt-progress -->
+				</a>
+				<!-- End scroll to top button -->
+
+			</div>
+			<!-- End content wrap -->
+
+
+		</main>
+		<!-- End body inner -->
+
+
+        
+
+		<!-- ====================
+		///// Scripts below /////
+		===================== -->
+
+		<!-- Core JS -->
+		<script src="assets/vendor/jquery/jquery.min.js"></script> <!-- jquery JS (https://jquery.com) -->
+
+		<!-- Libs and Plugins JS -->
+		<script src="assets/vendor/gsap/gsap.min.js"></script> <!-- GSAP JS (https://gsap.com/) -->
+		<script src="assets/vendor/gsap/ScrollToPlugin.min.js"></script> <!-- GSAP ScrollToPlugin JS (https://gsap.com/docs/v3/Plugins/ScrollToPlugin/) -->
+		<script src="assets/vendor/gsap/ScrollTrigger.min.js"></script> <!-- GSAP ScrollTrigger JS (https://gsap.com/docs/v3/Plugins/ScrollTrigger/) -->
+		<script src="assets/vendor/lenis.min.js"></script> <!-- Lenis (smooth scroll) JS (https://lenis.darkroom.engineering/) -->
+		<script src="assets/vendor/isotope/imagesloaded.pkgd.min.js"></script> <!-- imagesloaded JS (http://imagesloaded.desandro.com) -->
+		<script src="assets/vendor/isotope/isotope.pkgd.min.js"></script> <!-- Isotope JS (http://isotope.metafizzy.co) -->
+		<script src="assets/vendor/isotope/packery-mode.pkgd.min.js"></script> <!-- Isotope Packery Mode JS (https://isotope.metafizzy.co/layout-modes/packery.html) -->
+		<script src="assets/vendor/fancybox/js/fancybox.umd.js"></script> <!-- Fancybox (lightbox) JS (https://fancyapps.com/) -->
+		<script src="assets/vendor/swiper/js/swiper-bundle.min.js"></script> <!-- Swiper JS (https://swiperjs.com/) -->
+
+		<!-- Master JS -->
+		<script src="assets/js/theme.js"></script>
+
+
+
+	</body>
+
+</html>

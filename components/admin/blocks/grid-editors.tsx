@@ -1,9 +1,12 @@
 // components/admin/blocks/grid-editors.tsx
 'use client';
 
+import { useState } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
 import { ItemsEditor, MiniField } from './items-editor';
+import { CustomSchemaForm } from './custom-field-editor';
 import { registeredCustomBlocks } from '@/lib/blocks/custom-registry';
+import { CUSTOM_BLOCK_SCHEMAS } from '@/lib/blocks/custom-schemas';
 import type { ContentBlock } from '@/lib/blocks/types';
 import { useT } from '../i18n-provider';
 
@@ -304,6 +307,12 @@ export function CustomEditor({
 }) {
   const t = useT();
   const available = registeredCustomBlocks();
+  // Real form fields for the components lib/blocks/custom-schemas.ts knows
+  // about (every al-ai.ai-pages block used across the site's pages). A
+  // component registered without a schema entry still falls back to the raw
+  // JSON textarea below, same as before this existed.
+  const schema = CUSTOM_BLOCK_SCHEMAS[block.component];
+  const [showRaw, setShowRaw] = useState(false);
 
   return (
     <div className="space-y-3">
@@ -339,7 +348,29 @@ export function CustomEditor({
         </p>
       )}
 
-      <PropsEditor value={block.props} onChange={(props) => onChange({ ...block, props })} />
+      {schema ? (
+        <>
+          <CustomSchemaForm
+            schema={schema}
+            props={block.props}
+            onChange={(props) => onChange({ ...block, props })}
+          />
+
+          <button
+            type="button"
+            onClick={() => setShowRaw((v) => !v)}
+            className="text-xs text-[var(--admin-text-muted)] underline hover:text-[var(--admin-text-secondary)]"
+          >
+            {showRaw ? 'Hide raw JSON' : 'Edit raw JSON instead'}
+          </button>
+
+          {showRaw && (
+            <PropsEditor value={block.props} onChange={(props) => onChange({ ...block, props })} />
+          )}
+        </>
+      ) : (
+        <PropsEditor value={block.props} onChange={(props) => onChange({ ...block, props })} />
+      )}
     </div>
   );
 }

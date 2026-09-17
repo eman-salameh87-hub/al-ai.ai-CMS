@@ -33,3 +33,41 @@ export function registeredCustomBlocks(): string[] {
 //
 // Nothing is registered by default, so a `custom` block renders nothing until a
 // developer opts a component in.
+
+import { PeachHero } from '@/components/site/blocks/peach-hero';
+registerCustomBlock('peach-hero', PeachHero as CustomComponent);
+
+// al-ai.ai layout-fidelity components — see each file's header comment for
+// which al-ai.ai-pages section it reproduces.
+import { SplitIntro } from '@/components/site/blocks/split-intro';
+registerCustomBlock('split-intro', SplitIntro as CustomComponent);
+
+import { ServicePanels } from '@/components/site/blocks/service-panels';
+registerCustomBlock('service-panels', ServicePanels as CustomComponent);
+
+import { SectorGrid } from '@/components/site/blocks/sector-grid';
+registerCustomBlock('sector-grid', SectorGrid as CustomComponent);
+
+import { CompactList } from '@/components/site/blocks/compact-list';
+registerCustomBlock('compact-list', CompactList as CustomComponent);
+
+import { RoundCta } from '@/components/site/blocks/round-cta';
+registerCustomBlock('round-cta', RoundCta as CustomComponent);
+
+import { HeadingArrow } from '@/components/site/blocks/heading-arrow';
+registerCustomBlock('heading-arrow', HeadingArrow as CustomComponent);
+
+import { ContentSection } from '@/components/site/blocks/content-section';
+registerCustomBlock('content-section', ContentSection as CustomComponent);
+
+import { AboutIntro } from '@/components/site/blocks/about-intro';
+registerCustomBlock('about-intro', AboutIntro as CustomComponent);
+
+import { PageHeaderBanner } from '@/components/site/blocks/page-header-banner';
+registerCustomBlock('page-header-banner', PageHeaderBanner as CustomComponent);
+
+import { ContactSection } from '@/components/site/blocks/contact-section';
+registerCustomBlock('contact-section', ContactSection as CustomComponent);
+
+import { PageHeaderFull } from '@/components/site/blocks/page-header-full';
+registerCustomBlock('page-header-full', PageHeaderFull as CustomComponent);

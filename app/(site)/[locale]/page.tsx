@@ -48,7 +48,15 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       {blocks.length > 0 && (
         // No top padding when the slider leads: a hero has to sit flush under
         // the navbar, and py-16 would leave a band of white above it.
-        <section className={leadsWithHero ? 'pb-16 px-4 max-w-4xl mx-auto' : 'py-16 px-4 max-w-4xl mx-auto'}>
+        //
+        // max-w-[1282px] (not max-w-4xl) when hero-led, matching
+        // theme-black.css's `.tt-wrap` (1282px) that every FULL_BLEED
+        // `custom` block resolves its own width against — see
+        // [segment]/page.tsx's identical comment for why: without this the
+        // plain heading/paragraph/rich-text blocks sat inside a narrower
+        // 896px column than the full-bleed sections below them and never
+        // shared an edge.
+        <section className={leadsWithHero ? 'pb-16 px-4 max-w-[1282px] mx-auto' : 'py-16 px-4 max-w-4xl mx-auto'}>
           <ContentRenderer blocks={blocks} locale={typedLocale} />
         </section>
       )}

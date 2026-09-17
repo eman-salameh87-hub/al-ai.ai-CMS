@@ -25,6 +25,7 @@ import {
   ApplicationFormBlock,
 } from '@/components/site/blocks/legacy-blocks';
 import { resolveCustomBlock } from '@/lib/blocks/custom-registry';
+import { FULL_BLEED, isHeroBlock } from '@/lib/blocks/layout';
 import type { ContentBlock } from '@/lib/blocks/types';
 
 const tiptapExtensions = [StarterKit, TiptapImage, TiptapLink];
@@ -46,11 +47,31 @@ interface ContentRendererProps {
 export function ContentRenderer({ blocks, locale = 'ar', pageSlug }: ContentRendererProps) {
   if (!blocks || !Array.isArray(blocks)) return null;
 
+  /*
+   * index.html gives everything BELOW the hero `id="tt-page-content"` —
+   * the target of the hero's own "Scroll to Explore" link
+   * (peach-hero.tsx: `<a href="#tt-page-content" ...>`). We never rendered
+   * that id anywhere, so clicking that link ran theme.js's smooth-scroll
+   * handler against `t("#tt-page-content").offset()`, which jQuery
+   * returns as `undefined` for a selector that matches nothing — and
+   * `.top` on that threw "Cannot read properties of undefined (reading
+   * 'top')", uncaught, confirmed live via the console. That one broken
+   * link isn't itself the sticky-testimonials overlap this was chasing,
+   * but an uncaught exception on a shared page instance is worth closing
+   * regardless of which handler trips it.
+   */
+  const leadsWithHero = isHeroBlock(blocks[0]?.type ?? '');
+  const heroBlock = leadsWithHero ? blocks[0] : null;
+  const restBlocks = leadsWithHero ? blocks.slice(1) : blocks;
+
   return (
     <div className="space-y-6" data-test-id="content-renderer">
-      {blocks.map((block, idx) => (
-        <BlockRenderer key={idx} block={block} locale={locale} pageSlug={pageSlug} />
-      ))}
+      {heroBlock && <BlockRenderer block={heroBlock} locale={locale} pageSlug={pageSlug} />}
+      <div id={leadsWithHero ? 'tt-page-content' : undefined} className="space-y-6">
+        {restBlocks.map((block, idx) => (
+          <BlockRenderer key={idx} block={block} locale={locale} pageSlug={pageSlug} />
+        ))}
+      </div>
     </div>
   );
 }
@@ -112,8 +133,17 @@ function BlockRenderer({
         return null;
       }
       return (
+        // prose-invert: Tailwind Typography's own colours (near-black body
+        // text, dark headings) assume a light page background. Every page
+        // this renders on is theme-black.css's dark theme, so the plain
+        // "prose" palette painted this block's text a muted charcoal that
+        // read as barely-visible grey against the black background instead
+        // of theme-black.css's actual body colour (--tt-text-color, an
+        // off-white). prose-invert is Typography's matching dark-mode
+        // palette (light body text, white-ish headings/strong) — the
+        // correct pairing for this site, not a one-off recolour.
         <div
-          className="prose prose-lg max-w-none"
+          className="prose prose-lg prose-invert max-w-none"
           dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(html) }}
         />
       );
@@ -472,7 +502,34 @@ function BlockRenderer({
         }
         return null;
       }
-      return <Component {...block.props} />;
+      /*
+       * Every component registered in custom-registry.tsx today is one of
+       * the al-ai.ai-pages literal-markup sections (split-intro,
+       * service-panels, sector-grid, compact-list, round-cta,
+       * heading-arrow, peach-hero) — each renders its own `.tt-wrap`/
+       * `.tt-section` and sizes itself against theme-black.css's `.tt-wrap`
+       * rule (max-width: 1282px), not against whatever column this block
+       * happens to render inside.
+       *
+       * The home/about page (see app/(site)/[locale]/page.tsx) wraps the
+       * WHOLE ContentRenderer in `max-w-4xl mx-auto` (896px) for the sake of
+       * plain prose blocks — heading/paragraph/rich-text. Without this
+       * escape, that 896px cap was clipping every al-ai.ai-pages section
+       * down to well under theme-black.css's own 1282px, which is exactly
+       * why "Explore Our Services", the sticky-testimonials band, and this
+       * heading-arrow/compact-list strip all rendered narrower than
+       * index.html with a huge dead margin on the right (reported by the
+       * user comparing localhost against the live site). FULL_BLEED breaks
+       * a block out to the viewport edge regardless of how its ancestor is
+       * centered — the exact trick peach-hero.tsx already applies to
+       * itself for the same ancestor — so `.tt-wrap` inside it is the only
+       * thing left deciding the block's width, matching production.
+       */
+      return (
+        <div className={FULL_BLEED}>
+          <Component {...block.props} />
+        </div>
+      );
     }
 
     default:

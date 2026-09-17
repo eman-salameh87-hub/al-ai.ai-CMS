@@ -361,26 +361,63 @@
  */
 @layer base {
   /*
-   * Bitter for headings, Lato/Cairo for copy — the legacy pairing.
-   *
-   * Scoped to .site-body so the admin panel is untouched: it has its own
-   * type scale, and a serif admin heading would be a regression nobody asked
-   * for.
+   * Removed per request: the generic heading font-family/font-weight
+   * override used to apply to any <h1>-<h6> without a tt-/pgi-/pcli-/ph-
+   * class — but literal al-ai.ai-pages markup has plain unclassed headings
+   * too (e.g. contact-section.tsx's `<h6>{talkTitle}</h6>`), which this
+   * still caught and forced onto Georgia/Bitter, overriding
+   * theme-black.css's own `.tt-contact-info h6` styling. Only the shared
+   * body font-family remains.
    */
-  .site-body :is(h1, h2, h3, h4, h5, h6) {
-    font-family: var(--font-display), var(--font-cairo), Georgia, serif;
-    font-weight: 700;
-  }
-
   .site-body {
     font-family: var(--font-body), var(--font-cairo), system-ui, sans-serif;
   }
+}
 
-  /* Arabic has no Bitter glyphs; Cairo leads the stack instead of trailing it. */
-  .site-body[dir='rtl'] :is(h1, h2, h3, h4, h5, h6),
-  [dir='rtl'] .site-body :is(h1, h2, h3, h4, h5, h6) {
-    font-family: var(--font-cairo), system-ui, sans-serif;
-  }
+/*
+ * The al-ai.ai-pages section components (content-section.tsx, about-intro.tsx,
+ * round-cta.tsx, page-header-banner.tsx and the rest) all pass a literal
+ * `border-top` class straight through to helper.css's own utility —
+ * `.border-top { border-top: 1px solid var(--tt-border-color) !important; }`
+ * — which is what drew the thin divider line at the top of every section on
+ * every inner page. Removed site-wide per request; `!important` on the
+ * source rule means beating it needs both `!important` and higher
+ * specificity here, not just a later rule.
+ */
+.tt-section.border-top {
+  border-top: 0 !important;
+}
+
+/*
+ * Footer content was hugging the left edge instead of centering with the
+ * rest of the page. Force-center it directly.
+ */
+#tt-footer .tt-footer-inner {
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/*
+ * index.html's "Empower growth with AI" sticky-testimonial cards
+ * (.tt-stte-card) carry their own inline
+ * style="background-color:#f2f1ee !important" — the ONLY way the source
+ * gets a light card, because theme-black.css's own site-specific override
+ * block (added for al-ai.ai's dark redesign) sets
+ * `.tt-stte-card { background-color: #010208 !important; }`, and that
+ * beats a plain (non-!important) inline style.
+ *
+ * React's `style` prop can't express `!important` (it silently drops the
+ * whole declaration rather than setting it), so
+ * service-panels.tsx's `style={{ backgroundColor: '#f2f1ee' }}` was losing
+ * to theme-black.css and rendering the cards near-black-on-black —
+ * confirmed against the live al-ai.ai site, whose actual computed card
+ * background IS #f2f1ee. Same specificity/!important fight as the earlier
+ * heading-font fix above, same kind of fix: an equal-or-higher-specificity
+ * !important rule of our own, outside any @layer so it competes with
+ * theme-black.css on plain CSS terms rather than Tailwind's layer order.
+ */
+.tt-sticky-testimonials.tt-stte-reversed-colors .tt-stte-card {
+  background-color: #f2f1ee !important;
 }
 
 @layer components {

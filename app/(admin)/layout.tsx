@@ -36,6 +36,11 @@ export async function generateMetadata(): Promise<Metadata> {
       : t('brand.panelTitle'),
     // The admin panel must never be indexed.
     robots: { index: false, follow: false },
+    // This is its own root layout (see the file header) with no `icons` of
+    // its own before this — the site's own generateMetadata setting
+    // settings.favicon (app/(site)/[locale]/layout.tsx) never applied here,
+    // so every /admin tab showed no favicon at all.
+    icons: settings?.favicon ? { icon: settings.favicon } : undefined,
   };
 }
 

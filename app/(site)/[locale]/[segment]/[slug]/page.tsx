@@ -84,6 +84,10 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     type: 'article',
     noIndex: row.noIndex ?? false,
     siteName: settings?.siteName,
+    // See app/(site)/[locale]/[segment]/page.tsx's matching comment — a
+    // page's own generateMetadata replaces the layout's `icons` field
+    // entirely rather than inheriting it.
+    icon: settings?.favicon,
   });
 }
 

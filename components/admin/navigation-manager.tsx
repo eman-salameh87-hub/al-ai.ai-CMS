@@ -330,7 +330,12 @@ export function NavigationManager({ initial }: { initial: NavRow[] }) {
           {t('nav.emptyIn', { location: t(LOCATION_KEY[location]) })}
         </p>
       ) : (
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+        /* Explicit `id`: see components/admin/block-builder.tsx's matching
+           comment — without one, dnd-kit's own render-order counter can
+           assign a different aria-describedby id on the server than on the
+           client and React throws a hydration mismatch. `location` is
+           already unique per rendered list here. */
+        <DndContext id={`nav-dnd-${location}`} sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
           <SortableContext items={ordered.map((r) => r.id)} strategy={verticalListSortingStrategy}>
             <ul className="admin-card divide-y divide-[var(--admin-line)] p-0">
               {ordered.map((row) => (

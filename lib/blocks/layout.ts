@@ -27,7 +27,7 @@ export const FULL_BLEED = 'mx-[calc(50%-50vw)] w-screen max-w-[100vw]';
  * already open with one of these — otherwise a static banner sits above the
  * thing built to be the banner.
  */
-export const HERO_BLOCK_TYPES = ['slider', 'video-hero'] as const;
+export const HERO_BLOCK_TYPES = ['slider', 'video-hero', 'custom'] as const;
 
 export function isHeroBlock(type: string): boolean {
   return (HERO_BLOCK_TYPES as readonly string[]).includes(type);

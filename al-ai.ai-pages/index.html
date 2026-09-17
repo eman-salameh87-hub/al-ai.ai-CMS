@@ -1,0 +1,954 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+
+		<!-- Title -->
+		<title>al-ai.ai | Home</title>
+
+		<!-- Meta -->
+		<meta charset="utf-8">
+		<meta name="description" content="The company focuses its efforts on the crucial pre-processing stage to ensure data is clean, normalized, and optimized for AI applications. This methodical approach ensures high-quality data is fed into their custom AI systems, leading to more accurate predictions and outcomes.">
+		<meta name="author" content="al-ai.ai">
+
+		<!-- Open Graph -->
+		<meta property="og:type" content="website" />
+		<meta property="og:locale" content="en_EN" />
+		<meta property="og:site_name" content="al-ai.ai" />
+		<meta property="og:url" content="https://al-ai.ai/" />
+		<meta property="og:title" content="al-ai.ai" />
+		<meta property="og:description" content="The company focuses its efforts on the crucial pre-processing stage to ensure data is clean, normalized, and optimized for AI applications. This methodical approach ensures high-quality data is fed into their custom AI systems, leading to more accurate predictions and outcomes. " />
+		<meta property="og:image" content="https://al-ai.ai/assets/img/new-aeon/al-ai-ai-logo.jpg" />
+		<meta property="og:image:secure_url" content="https://al-ai.ai/assets/img/new-aeon/al-ai-ai-logo.jpg" />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+
+
+		<!-- Mobile Meta -->
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+		<!-- Favicon -->
+		<link rel="shortcut icon" href="assets/img/new-aeon/fav.ico">
+
+
+		<!-- Google fonts -->
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+		<link href="../../css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+		<link href="../../css2-1?family=Big+Shoulders+Display:wght@100..900&display=swap" rel="stylesheet">
+
+		<!-- Libs and Plugins CSS -->
+		<link rel="stylesheet" href="assets/vendor/fontawesome/css/all.min.css"> 
+		<link rel="stylesheet" href="assets/vendor/fancybox/css/fancybox.css"> 
+		<link rel="stylesheet" href="assets/vendor/swiper/css/swiper-bundle.min.css"> 
+
+		<!-- Master CSS -->
+		<link rel="stylesheet" href="assets/css/helper.css">
+		<link rel="stylesheet" href="assets/css/theme-black.css">
+
+		<style>
+			.tt-btn2 {
+				position: relative;
+				display: inline-flex;
+				align-items: center;		
+				background-color: #fff;
+				padding: 3px 15px;
+				text-transform: uppercase;
+				text-align: center;
+				font-size: 15px;
+				font-weight: 500;
+				overflow: hidden;
+				cursor: pointer;
+				letter-spacing: 0.5px;
+				border: none;
+				border-radius: 50px;
+				z-index: 9;
+			}
+			iframe {
+			-webkit-overflow-scrolling: touch !important;
+			overflow: auto !important;
+			touch-action: pan-y !important;
+			}
+
+			@media (max-width: 768px) {
+				.peach-container, canvas, .peach-scene { 
+					pointer-events: none !important; 
+				}
+				.tt-btn2 img{
+    				width: 80px !important;
+				}
+			}
+			@media (max-width: 1400px) {
+				.tt-scroll-down {
+					right: 5px;
+					bottom: 80px;
+				}
+			}
+
+			/* Page loader */
+			#al-loader{
+				position:fixed; inset:0; z-index:999999;
+				background:#000;
+				display:flex; align-items:center; justify-content:center; flex-direction:column;
+				visibility:visible !important; opacity:1;
+				transition:opacity .6s ease, visibility .6s ease;
+			}
+			#al-loader.al-hide{ opacity:0; visibility:hidden !important; pointer-events:none; }
+			.al-stage{ position:relative; width:180px; height:180px; display:flex; align-items:center; justify-content:center; }
+			.al-ring{ position:absolute; border-radius:50%; border:1px solid transparent; }
+			.al-ring-1{ width:180px; height:180px; border-top-color:rgba(255,255,255,.65); border-right-color:rgba(255,255,255,.15); animation:alSpin 2.4s linear infinite; }
+			.al-ring-2{ width:138px; height:138px; border-bottom-color:rgba(255,255,255,.4); border-left-color:rgba(255,255,255,.1); animation:alSpin 1.8s linear infinite reverse; }
+			@keyframes alSpin{ to{ transform:rotate(360deg); } }
+			.al-logo{ width:64px; height:auto; position:relative; z-index:2; animation:alPulse 1.8s ease-in-out infinite; filter:drop-shadow(0 0 14px rgba(255,255,255,.35)); }
+			@keyframes alPulse{ 0%,100%{ transform:scale(1); opacity:.9; } 50%{ transform:scale(1.08); opacity:1; } }
+			.al-label{ margin-top:28px; color:rgba(255,255,255,.7); font-family:'Poppins',sans-serif; font-size:12px; letter-spacing:.25em; text-transform:uppercase; }
+			@media (prefers-reduced-motion: reduce){
+				.al-ring, .al-logo{ animation:none !important; }
+			}
+			
+		</style>
+
+	</head>
+
+	<body id="body" class="tt-transition tt-noise tt-magic-cursor tt-smooth-scroll">
+
+		<div id="al-loader" role="status" aria-live="polite" aria-label="Loading al-ai.ai">
+			<div class="al-stage">
+				<div class="al-ring al-ring-1"></div>
+				<div class="al-ring al-ring-2"></div>
+				<img src="assets/img/new-aeon/al-ai.png" class="al-logo" alt="al-ai.ai">
+			</div>
+			<div class="al-label">Loading</div>
+		</div>
+
+		<main id="body-inner">
+
+			<div id="tt-page-transition">
+				<div class="tt-ptr-overlay-top tt-noise"></div>
+				<div class="tt-ptr-overlay-bottom tt-noise"></div>
+				<div class="tt-ptr-preloader">
+					<div class="tt-ptr-prel-content">
+					<img src="assets/img/new-aeon/al-ai.png" class="tt-ptr-prel-image" alt="Logo">
+					</div> 
+				</div> 
+			</div>
+
+			<div id="magic-cursor">
+				<div id="ball"></div>
+			</div> 
+
+			<header id="tt-header" class="tt-header-alter tt-header-filled">
+				<div class="tt-header-inner tt-noise"> 
+
+					<div class="tt-header-col tt-header-col-left">
+						<div class="tt-logo"> 
+							<a href="/" class="tt-magnetic-item">
+								<img src="assets/img/new-aeon/al-ai.png" class="tt-logo-light" alt="Logo">
+								<img src="assets/img/new-aeon/al-ai.png" class="tt-logo-dark" alt="Logo">
+							</a>
+						</div>
+					</div>
+
+					<div class="tt-header-col tt-header-col-center">
+						<nav class="tt-main-menu tt-m-menu-center">
+							<div class="tt-main-menu-holder">
+								<div class="tt-main-menu-inner">
+									<div class="tt-main-menu-content">
+										<ul class="tt-main-menu-list">
+
+											<li class="active">
+												<a href="index.html">Home</a>
+											</li>
+
+											<li>
+												<a href="about.html">About</a>
+											</li>
+
+											<li class="tt-submenu-wrap tt-submenu-master">
+												<div class="tt-submenu-trigger">
+													<a href="services.html">Services</a>
+												</div> 
+												<div class="tt-submenu">
+													<ul class="tt-submenu-list">
+
+														<li><a href="data-driven.html">Data Driven</a></li>
+														<li><a href="agentic-AI-and-multi-agent-systems.html">Agentic AI & Multi-Agent Systems </a></li>
+														<li><a href="conversational-and-edge-analytics.html">Conversational & Edge Analytics</a></li>
+														<li><a href="automated-decision-making-and-BPA.html">Automated Decision-Making & BPA </a></li>
+														<li><a href="polarization-and-pre-indoctrination.html">Polarization & Indoctrination​  </a></li>						
+														<li><a href="behavioral-intelligence.html">Behavioral Intelligence</a></li>
+							
+													</ul> 
+												</div> 
+											</li>
+
+											<li>
+												<a href="contact.html">Contact</a>
+											</li>
+											
+
+										</ul>
+									</div>
+								</div>
+							</div>
+						</nav> 
+					</div>
+
+					<div class="tt-header-col tt-header-col-right">
+						<div id="tt-m-menu-toggle-btn-wrap">
+							<div class="tt-m-menu-toggle-btn-text">
+								<span class="tt-m-menu-text-menu">Menu</span>
+								<span class="tt-m-menu-text-close">Close</span>
+							</div>
+							<div class="tt-m-menu-toggle-btn-holder">
+								<a href="#" class="tt-m-menu-toggle-btn"><span></span></a>
+							</div>
+						</div>
+						<a href="https://newaeonjo-001-site3.dtempurl.com/" class="tt-btn2 tt-btn-secondary  tt-magnetic-item">
+							<img src="assets/img/new-aeon/Revacity.png" alt="Revacity" style="width: 100px;max-width: fit-content !important;" />
+						</a>
+
+					</div>
+				</div>
+			</header>
+	
+			<div id="tt-content-wrap">
+		
+				<div id="page-header" class="ph-full ph-full-m ph-center ph-cap-xxxxlg ph-image-parallax ph-caption-parallax ">
+				
+					<iframe 
+						id="mainBanner"
+						src="https://severe-fncjenao.peachworlds.com/"
+						style="width:100%; border:none; height:100vh; padding:0; margin:0;"
+						scrolling="yes">
+					</iframe> 
+
+					<div class="page-header-inner ph-mask">
+						<div class="ph-mask-inner tt-wrap">
+							<div class="ph-caption">
+								<div class="ph-caption-inner">
+									<h1 class="ph-caption-title">Intelligent <br> Solutions</h1>
+									<div class="ph-caption-description max-width-1000">
+										Over 15 years of experience<br> in the degital marketing and AI solutions
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="tt-scroll-down">
+						<a href="#tt-page-content" class="tt-scroll-down-inner tt-magnetic-item" data-offset="0">
+							<div class="tt-scrd-icon"></div>
+							<svg viewbox="0 0 500 500">
+								<defs>
+									<path d="M50,250c0-110.5,89.5-200,200-200s200,89.5,200,200s-89.5,200-200,200S50,360.5,50,250" id="textcircle"></path>
+								</defs>
+								<text dy="30">
+									<textpath xlink:href="#textcircle">Scroll to Explore - Scroll to Explore -</textpath>
+								</text>
+							</svg>
+						</a>
+					</div>
+
+				</div>
+	
+				<div id="tt-page-content">
+
+					<div class="tt-section tt-wrap padding-top-xlg-140 border-top">
+						<div class="tt-row">
+							<div class="tt-col-xl-8">
+								<div class="tt-heading tt-heading-xxxlg">
+									<h2 class="tt-heading-title tt-text-reveal">Explore <br /> Our Services </h2>
+								</div>
+								
+								<div class="max-width-500 text-pretty tt-text-reveal">
+									Unlock the power of AI-driven strategies, intelligent data insights, and next-generation digital marketing.
+								</div> 
+								<a href="services.html" class="tt-btn tt-btn-outline margin-top-10 tt-magnetic-item tt-anim-fadeinup">
+									<span data-hover="View All">View All</span>
+								</a>
+
+							</div> 
+
+							<div class="tt-col-xl-4 tt-align-self-start margin-top-30">
+									
+								<img src="assets/img/new-aeon/digital-art-ai-technology-background.jpg" loading="lazy" alt="image">
+
+							</div> 
+						</div>
+					</div>
+
+					<div class="tt-section tt-wrap" style="margin: 0 auto;">
+						<div class="tt-horizontal-accordion tt-hac-alter-hover tt-anim-fadeinup">
+
+
+							<div class="tt-hac-item cursor-alter">
+								<div class="tt-hac-item-count"></div>
+								<div class="tt-hac-item-inner">
+									<div class="tt-hac-item-content">
+										<div class="tt-haci-content-top">
+											<h2 class="tt-haci-title">Data-Driven &<br> AI Solution</h2>
+											<div class="tt-haci-description"> 
+												We focus our efforts on the crucial pre-processing stage to ensure data is clean, normalized, and optimized for AI applications. This methodical approach ensures high-quality data feeds into our custom AI systems, leading to more accurate predictions and superior outcomes.
+											</div> 
+										</div> 
+
+										<div class="">
+											<a href="data-driven.html" class="tt-btn tt-btn-outline tt-magnetic-item">
+												<span data-hover="Read More">Read More</span>
+											</a>
+										</div> 
+									</div> 
+								</div> 
+							</div>
+
+							<div class="tt-hac-item cursor-alter">
+								<div class="tt-hac-item-count"></div>
+								<div class="tt-hac-item-inner">
+									<div class="tt-hac-item-content">
+										<div class="tt-haci-content-top">
+											<h2 class="tt-haci-title">Agentic AI & <br> Agent Systems</h2>
+											<div class="tt-haci-description"> 
+												Autonomous AI agents that work independently and collaboratively to achieve business goals.Rather than offering single-purpose AI tools, the company builds an integrated, multi-agent ecosystem designed for seamless Goal-driven automation, cross-functional collaboration.
+											</div> 
+										</div> 
+
+										<div class="">
+											<a href="agentic-AI-and-multi-agent-systems.html" class="tt-btn tt-btn-outline tt-magnetic-item">
+												<span data-hover="Read More">Read More</span>
+											</a>
+										</div> 
+									</div> 
+								</div> 
+							</div>
+
+							<div class="tt-hac-item cursor-alter">
+								<div class="tt-hac-item-count"></div>
+								<div class="tt-hac-item-inner">
+									<div class="tt-hac-item-content">
+										<div class="tt-haci-content-top">
+											<h2 class="tt-haci-title">Conversational<br> & Edge Analytics</h2>
+											<div class="tt-haci-description"> 
+												Our conversational and edge analytics solutions enable seamless human-machine interaction, faster decision-making, and intelligent automation across every customer touchpoint. By combining natural language understanding with real-time data processing, we deliver immediate, actionable insights.
+											</div> 
+										</div> 
+
+										<div class="">
+											<a href="conversational-and-edge-analytics.html" class="tt-btn tt-btn-outline tt-magnetic-item">
+												<span data-hover="Read More">Read More</span>
+											</a>
+										</div> 
+									</div> 
+								</div> 
+							</div>
+
+						</div>
+					</div>
+
+					<div class="tt-section tt-wrap no-padding-bottom">
+						<div class="tt-row margin-bottom-xlg-80">
+							<div class="tt-col-xl-8">
+								<div class="tt-heading tt-heading-xxxlg">
+									<h2 class="tt-heading-title tt-text-reveal">Powering  <br /> Every Sector </h2>
+								</div>
+														
+							</div> 
+
+							<div class="tt-col-xl-4 tt-align-self-start margin-top-30 powering-every-sector">
+
+								<div class="max-width-500 text-pretty tt-text-reveal">
+									Unlock the power of AI-driven strategies, intelligent data insights, and next-generation digital marketing across industries:
+								</div> 
+								<a href="services.html" class="tt-btn tt-btn-outline margin-top-10 tt-magnetic-item tt-anim-fadeinup">
+									<span data-hover="View All">View All</span>
+								</a>
+
+							</div> 
+						</div>
+
+						<div id="portfolio-grid" class="pgi-hover">
+							<div class="tt-grid ttgr-layout-creative-2 ttgr-gap-4">
+							
+
+								<div class="tt-grid-items-wrap isotope-items-wrap  margin-top-40">
+
+									<div class="tt-grid-item isotope-item lifestyle">
+										<div class="ttgr-item-inner">
+
+											<div class="portfolio-grid-item">
+												<div class="pgi-image-wrap" >
+													
+													<div class="pgi-image-holder">
+														<div class="pgi-image-inner tt-anim-zoomin">
+															<figure class="pgi-image ttgr-height cover-opacity-2">
+																<img src="assets/img/new-aeon/marketing2.png" loading="lazy" alt="image">
+															</figure> 
+														</div> 
+													</div> 
+												</div> 
+
+												<div class="pgi-caption">
+													<div class="pgi-caption-inner">
+														<h2 class="pgi-title">
+															Marketing & Media
+														</h2>
+														<div class="pgi-categories-wrap">
+															<div class="pgi-category">Personalized ad targeting uses data and user behavior to deliver ads that are more relevant to each individual, increasing engagement and conversion rates.</div>
+														</div> 
+													</div> 
+												</div> 
+											</div>
+											
+
+										</div> 
+									</div>
+									
+									<div class="tt-grid-item isotope-item lifestyle">
+										<div class="ttgr-item-inner">
+
+											<div class="portfolio-grid-item">
+												<div class="pgi-image-wrap">
+													<div class="pgi-image-holder">
+														<div class="pgi-image-inner tt-anim-zoomin">
+															<figure class="pgi-image ttgr-height cover-opacity-2">
+																<img src="assets/img/new-aeon/Ai-fashion.png" loading="lazy" alt="image">
+															</figure> 
+														</div> 
+													</div> 
+												</div> 
+
+												<div class="pgi-caption">
+													<div class="pgi-caption-inner">
+														<h2 class="pgi-title">
+															Smart Fashion
+														</h2>
+														<div class="pgi-categories-wrap">
+															<div class="pgi-category">Trend forecasting predicts upcoming styles, AI-powered design streamlines creativity, personalized styling tailors recommendations, and virtual try-ons enhance the digital shopping experience.</div>	
+														</div> 
+													</div> 
+												</div> 
+											</div>
+											
+
+										</div> 
+									</div>
+									
+									<div class="tt-grid-item isotope-item artistic">
+										<div class="ttgr-item-inner">
+
+											<div class="portfolio-grid-item">
+												<div class="pgi-image-wrap">
+													<div class="pgi-image-holder">
+														<div class="pgi-image-inner tt-anim-zoomin">
+															<figure class="pgi-image ttgr-height cover-opacity-2">
+																<img src="assets/img/new-aeon/Manufacturing.png" loading="lazy" alt="image">
+															</figure> 
+														</div> 
+													</div> 
+												</div> 
+
+												<div class="pgi-caption">
+													<div class="pgi-caption-inner">
+														<h2 class="pgi-title">
+															Manufacturing & Logistics
+														</h2>
+														<div class="pgi-categories-wrap">
+															<div class="pgi-category">Predictive maintenance anticipates equipment issues before failure, supply chain optimization improves efficiency and reduces costs, and quality control automation ensures consistent product standards through intelligent monitoring.</div>	
+														</div> 
+													</div> 
+												</div> 
+											</div>
+											
+
+										</div> 
+									</div>
+									
+
+									<div class="tt-grid-item isotope-item artistic">
+										<div class="ttgr-item-inner">
+
+											<div class="portfolio-grid-item">
+												<div class="pgi-image-wrap">
+													
+													<div class="pgi-image-holder">
+														<div class="pgi-image-inner tt-anim-zoomin">
+															<figure class="pgi-image ttgr-height cover-opacity-2">
+																<img src="assets/img/new-aeon/ai-real-state.png" loading="lazy" alt="image">
+															</figure> 
+														</div> 
+													</div> 
+												</div> 
+
+												<div class="pgi-caption">
+													<div class="pgi-caption-inner">
+														<h2 class="pgi-title">
+															Real Estate
+														</h2>
+														<div class="pgi-categories-wrap">
+															<div class="pgi-category">Property recommendations match users with suitable listings, market predictions analyze data to forecast trends and pricing, and AI-powered inquiry chatbots provide instant, accurate responses to customer questions.</div>
+														</div> 
+													</div> 
+												</div> 
+											</div>
+											
+
+										</div> 
+									</div>
+
+								</div>
+
+
+							</div>
+
+						</div>
+					</div>
+
+					<div class="tt-section tt-wrap border-bottom">
+						<div class="tt-sticker">
+
+							<div class="tt-row">
+								<div class="tt-col-lg-5 margin-bottom-40" >
+
+									<div class="tt-sticker-sticky tt-sticky-element">
+
+										<div class="tt-heading tt-heading-xxlg  no-padding-bottom no-margin padding-bottom-20">
+											<h3 class="tt-heading-subtitle tt-text-reveal"></h3>
+											<h2 class="tt-heading-title tt-text-reveal">Empower growth with AI</h2>
+											<p class="max-width-500 tt-text-reveal">Unleash the potential of smart AI solutions, data intelligence, and future-ready digital marketing.</p>
+										</div>
+
+										<a href="services.html" class="tt-btn tt-btn-outline tt-magnetic-item tt-anim-fadeinup">
+											<span data-hover="Read More">Read More</span>
+										</a>
+
+									</div>
+
+								</div> 
+								<div class="tt-col-lg-1"></div>
+								<div class="tt-col-lg-6">
+
+									<div class="tt-sticker-scroller">
+
+		
+										<div class="tt-sticky-testimonials tt-stte-reversed-colors">
+
+											
+											<div class="tt-stte-item">
+												<div class="tt-stte-card cursor-alter" style="background-color:#f2f1ee !important">
+													<div class="tt-stte-card-counter"></div>
+													<div class="tt-stte-card-caption">
+														<h2 class="tt-haci-title" style="width: 499.367px;">Automated Decision-Making</h2>
+														<div class="tt-stte-text">		
+															Business Process Automation leveraging Multi-Decision Pattern (MDP) frameworks and BPMN implementation for streamlined operations.
+														</div>
+														<div class="">
+															<a href="automated-decision-making-and-BPA.html" class="tt-btn tt-btn-outline tt-magnetic-item">
+																<span data-hover="Read More">Read More</span>
+															</a>
+														</div>
+													
+													</div> 
+												</div> 
+											</div>
+				
+											
+											<div class="tt-stte-item">
+												<div class="tt-stte-card cursor-alter" style="background-color:#f2f1ee !important">
+													<div class="tt-stte-card-counter"></div>
+													<div class="tt-stte-card-caption">
+														<h2 class="tt-haci-title" style="width: 499.367px;">Polarization & Indoctrination Analysis</h2>
+														<div class="tt-stte-text">
+															Understanding how organizations and markets split into distinct perspectives enables better strategic positioning and market segmentation.
+														</div>
+														<div class="">
+															<a href="polarization-and-pre-indoctrination.html" class="tt-btn tt-btn-outline tt-magnetic-item">
+																<span data-hover="Read More">Read More</span>
+															</a>
+														</div>
+													</div> 
+												</div> 
+											</div>
+											
+
+											
+											<div class="tt-stte-item">
+												<div class="tt-stte-card cursor-alter" style="background-color:#f2f1ee !important">
+													<div class="tt-stte-card-counter"></div>
+													<div class="tt-stte-card-caption">
+														<h2 class="tt-haci-title" style="width: 499.367px;">Behavioral Intelligence</h2>
+														<div class="tt-stte-text">
+															Our unique integration of AI, data science, psychology, and entrepreneurship creates a comprehensive "behavioral intelligence" platform that drives customer engagement.
+														</div>
+														<div class="">
+															<a href="behavioral-intelligence.html" class="tt-btn tt-btn-outline tt-magnetic-item">
+																<span data-hover="Read More">Read More</span>
+															</a>
+														</div>
+													</div> 
+												</div> 
+											</div>
+											
+
+											
+											<div class="tt-stte-item">
+												<div class="tt-stte-card cursor-alter" style="background-color:#f2f1ee !important">
+													<div class="tt-stte-card-counter"></div>
+													<div class="tt-stte-card-caption">
+														<h2 class="tt-haci-title" style="width: 499.367px;">Search Engine Marketing (SEM)</h2>
+														<div class="tt-stte-text">
+															SEM involves promoting websites by increasing their visibility in search engine results pages (SERPs) primarily through paid advertising—the key differentiator between SEM and SEO.
+														</div>
+														<div class="">
+															<a href="search-engine.html" class="tt-btn tt-btn-outline tt-magnetic-item">
+																<span data-hover="Read More">Read More</span>
+															</a>
+														</div>
+													</div> 
+												</div> 
+											</div>
+											
+
+											
+											<div class="tt-stte-item">
+												<div class="tt-stte-card cursor-alter" style="background-color:#f2f1ee !important">
+													<div class="tt-stte-card-counter"></div>
+													<div class="tt-stte-card-caption">
+														<h2 class="tt-haci-title" style="width: 499.367px;">Digital Media Expertise</h2>
+														<div class="tt-stte-text">
+															Professional social media management requires deep expertise beyond personal platform usage. Our team brings strategic thinking, analytics capabilities, and proven methodologies to maximize your social media ROI.
+														</div>
+														<div class="">
+															<a href="digital-media.html" class="tt-btn tt-btn-outline tt-magnetic-item">
+																<span data-hover="Read More">Read More</span>
+															</a>
+														</div>
+													</div> 
+												</div> 
+											</div>
+											
+
+
+
+										</div>
+										
+
+									</div>
+									
+
+								</div> 
+							</div> 
+
+						</div> 
+					</div>
+		
+					<div class="tt-section tt-wrap padding-top-xlg-140 border-top">
+						<div class="tt-row">
+							<div class="tt-col-xl-9" >
+
+								<div class="tt-heading tt-heading-xxxlg" >
+									<h2 class="tt-heading-title tt-text-reveal">Where AI Creates Impact </h2> 
+								</div>
+
+							</div> 
+						
+							<div class="tt-col-xl-3 tt-align-self-center">
+								
+								<div class="tt-big-arrow tt-ba-angle-bottom-left tt-anim-fadeinup">
+									<svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24">
+										<path d="M13.025 1l-2.847 2.828 6.176 6.176h-16.354v3.992h16.354l-6.176 6.176 2.847 2.828 10.975-11z"></path>
+									</svg>
+								</div>
+
+							</div> 
+						</div>
+					</div>
+
+					<div class="tt-section tt-wrap no-padding">
+						<div class="tt-portfolio-compact-list pcl-caption-hover pcl-image-hover">
+							<div class="pcli-inner">
+
+								<div class="pcli-item tt-anim-fadeinup">
+									<div class="pcli-item-inner">
+										<div class="pcli-col pcli-col-image">
+											<div class="pcli-image cover-opacity-2">
+												<img src="assets/img/new-aeon/automation-ai.png" loading="lazy" alt="Image">
+											</div> 
+										</div> 
+
+										<div class="pcli-col pcli-col-count">
+											<div class="pcli-count"></div>
+										</div>
+
+										<div class="pcli-col pcli-col-caption">
+											<div class="pcli-caption">
+												<h2 class="pcli-title">Automation & Optimization</h2>
+												<div class="pcli-categories">
+													<div class="pcli-category">Streamline workflows and enhance decision-making processes.</div>
+												</div> 
+											</div> 
+										</div> 
+									</div> 
+								</div>
+
+								<div class="pcli-item tt-anim-fadeinup">
+									<div class="pcli-item-inner">
+										<div class="pcli-col pcli-col-image">
+											<div class="pcli-image cover-opacity-2">
+												<img src="assets/img/new-aeon/data-ai.png" loading="lazy" alt="Image">
+											</div> 
+										</div>
+
+										<div class="pcli-col pcli-col-count">
+											<div class="pcli-count"></div>
+										</div> 
+
+										<div class="pcli-col pcli-col-caption">
+											<div class="pcli-caption">
+												<h2 class="pcli-title">Data & Predictive Analytics</h2>
+												<div class="pcli-categories">
+													<div class="pcli-category">Forecast trends and gain actionable insights from your data.</div>
+												</div> 
+											</div> 
+										</div> 
+									</div> 
+								</div>		
+
+
+								<div class="pcli-item tt-anim-fadeinup" style="border-bottom: 0px !important;">
+									<div class="pcli-item-inner">
+										<div class="pcli-col pcli-col-image">
+											<div class="pcli-image cover-opacity-2">
+												<img src="assets/img/new-aeon/image-inner19.png" loading="lazy" alt="Image">
+											</div> 
+										</div>
+
+										<div class="pcli-col pcli-col-count">
+											<div class="pcli-count"></div>
+										</div> 
+
+										<div class="pcli-col pcli-col-caption">
+											<div class="pcli-caption">
+												<h2 class="pcli-title">AI-Driven Solutions</h2>
+												<div class="pcli-categories">
+													<div class="pcli-category">Natural Language Processing (NLP), Computer Vision, <br />and Generative AI for content creation, recognition, and intelligent interaction.</div>
+												</div> 
+											</div> 
+										</div>
+											
+									</div> 
+								</div>
+
+								
+							</div> 
+
+						</div>
+					</div>
+
+					<div class="tt-section tt-wrap padding-top-xlg-120 padding-bottom-xlg-120 border-top">
+						<div class="tt-row margin-bottom-40">
+							<div class="tt-col-xl-9">
+
+								<div class="tt-heading tt-heading-xxlg no-margin" >
+									<h3 class="tt-heading-subtitle tt-text-reveal">Contact</h3>
+									<h2 class="tt-heading-title tt-text-reveal">Ready to Launch Your Project?</h2> 
+									<p>Let's create a future where technology doesn't just serve you it understands you. <br /> Connect with us today to start your AI-powered transformation.</p>
+								</div>
+
+							</div> 
+						
+							<div class="tt-col-xl-3 tt-align-self-end tt-xl-column-reverse margin-top-4 justify-content-center">
+								<div class="tt-big-round-ptn margin-top-30 margin-bottom-xlg-80 tt-anim-fadeinup">
+									<a href="contact.html" class="tt-big-round-ptn-holder tt-magnetic-item">
+										<div class="tt-big-round-ptn-inner">Let's<br> Connect!</div>
+									</a>
+								</div>
+							</div> 
+						</div>
+					</div>
+
+				</div>
+
+	
+				<footer id="tt-footer" class="border-top" style="padding-bottom: 0px !important; ">
+					<div class="tt-footer-inner tt-wrap max-width-1500">
+
+						<div class="tt-row">
+
+							<div class="tt-col-xl-3 tt-col-sm-6">
+								<div class="tt-footer-widget">
+									<ul class="tt-footer-widget-list">
+										<li>
+											<div class="tt-footer-logo"> 
+												<a href="/" class="tt-magnetic-item">
+													<img src="assets/img/new-aeon/al-ai.png" class="tt-logo-light" loading="lazy" alt="Logo"> 
+													<img src="assets/img/new-aeon/al-ai.png" class="tt-logo-dark" loading="lazy" alt="Logo"> 
+												</a>
+											</div>  
+										</li>
+										<li>
+											<p>A forward-thinking company that leverages artificial intelligence to automate tasks, improve operational efficiency, and drive smarter business decisions.</p>
+										</li>
+										<li>
+											<div class="tt-social-buttons">
+												<ul>
+													<li><a href="https://www.facebook.com/newaeongroup/" class="tt-magnetic-item" target="_blank" rel="noopener"><i class="fa-brands fa-facebook-f"></i></a></li>
+													<li><a href="https://www.instagram.com/newaeongroup/" class="tt-magnetic-item" target="_blank" rel="noopener"><i class="fa-brands fa-instagram"></i></a></li>
+													<li><a href="https://www.linkedin.com/company/new-aeon-digital" class="tt-magnetic-item" target="_blank" rel="noopener"><i class="fa-brands fa-linkedin"></i></a></li>
+													<li><a href="https://www.youtube.com/@newaeongroup8328" class="tt-magnetic-item" target="_blank" rel="noopener"><i class="fa-brands fa-youtube"></i></a></li>
+													<li><a href="https://x.com/newaeongroup" class="tt-magnetic-item" target="_blank" rel="noopener"><i class="fa-brands fa-x-twitter"></i></a></li> 
+												</ul>
+											</div> 
+										</li>
+									
+									</ul> 
+								</div> 
+							</div>
+
+							<div class="tt-col-xl-3 tt-col-sm-6">
+								<div class="tt-footer-widget">
+									<h5 class="tt-footer-widget-heading">Partners</h5>
+									<ul class="tt-footer-widget-list">
+										
+										<li>
+											Kingdom of Saudi Arabia - Riyadh - King Fahd Road, Al Olaya District
+										</li>
+										<li><a href="tel:+966568872222" class="tt-link"> +(966) 56 887 2222</a></li>
+										<li>
+											UAE - Office 01, Al Dana Bay, Sharm, Fujairah
+										</li>
+										<li><a href="tel:+971566016681" class="tt-link"> +(971) 56 601 6681</a></li>	
+										
+									</ul> 
+								</div> 
+							</div>
+
+							<div class="tt-col-xl-3 tt-col-sm-6">
+								<div class="tt-footer-widget">
+									<h5 class="tt-footer-widget-heading">Services</h5>
+									<ul class="tt-footer-widget-list">
+										<li><a class="tt-link"  style="text-transform: capitalize;" href="data-driven.html">Data-Driven & Solutions</a></li>
+										<li><a class="tt-link"  style="text-transform: capitalize;" href="agentic-AI-and-multi-agent-systems.html">Agentic AI &amp; Multi-Agent Systems </a></li>
+										<li><a class="tt-link"  style="text-transform: capitalize;" href="conversational-and-edge-analytics.html">Conversational &amp; Edge Analytics</a></li>
+										<li><a class="tt-link"  style="text-transform: capitalize;" href="automated-decision-making-and-BPA.html">Automated Decision-Making &amp; BPA </a></li>
+										<li><a class="tt-link"  style="text-transform: capitalize;" href="polarization-and-pre-indoctrination.html">Polarization &amp; Indoctrination&ZeroWidthSpace;  </a></li>						
+										<li><a class="tt-link"  style="text-transform: capitalize;" href="behavioral-intelligence.html">Behavioral Intelligence</a></li>
+									</ul>
+								</div> 
+							</div>	
+
+							<div class="tt-col-xl-3 tt-col-sm-6">
+								<div class="tt-footer-widget">
+									<h5 class="tt-footer-widget-heading">Contact</h5>
+									<ul class="tt-footer-widget-list">
+										<li>
+											Jordan - Dabooq
+										</li>
+										<li><a href="tel:+96265931029" class="tt-link"> +(962) 659 310 29</a></li>
+										<li>
+											Arizona - Phoenix 
+										</li>
+										<li><a href="tel:+14807440848" class="tt-link"> +1(480) 744 0848</a></li>
+										<li><a href="mailto:info@al-ai.ai" class="tt-link" style="text-transform: capitalize;">info@al-ai.ai</a></li>
+									</ul> 
+								</div> 
+							</div> 
+
+							
+							
+						
+						</div> 
+
+					</div> 
+					<div class="tt-footer-inner tt-wrap max-width-1500 border-top" style="margin-top: 50px;">
+
+						<div class="tt-row copyRights">
+
+							<div class="tt-col-xl-6 tt-col-sm-12">
+								<div class="tt-footer-widget">
+								    © 2026 al-ai.ai All Rights Reserved
+								</div> 
+							</div>	
+							
+							<div class="tt-col-xl-6 tt-col-sm-12">
+								<div class="tt-footer-widget text-right">
+								   	<a href="privacy-policy.html" class="tt-link">Privacy Policy</a> | 
+									<a href="terms-and-conditions.html" class="tt-link">Terms &amp; Conditions</a>
+								</div> 
+							</div>	
+						
+						</div> 
+
+					</div>
+				</footer>
+
+
+			</div>
+
+
+		</main>
+		<!-- End body inner -->
+
+
+		<!-- Core JS -->
+		<script src="assets/vendor/jquery/jquery.min.js"></script> 
+
+		<!-- Libs and Plugins JS -->
+		<script src="assets/vendor/gsap/gsap.min.js"></script> 
+		<script src="assets/vendor/gsap/ScrollToPlugin.min.js"></script> 
+		<script src="assets/vendor/gsap/ScrollTrigger.min.js"></script>
+		<script src="assets/vendor/lenis.min.js"></script> 
+		<script src="assets/vendor/isotope/imagesloaded.pkgd.min.js"></script>
+		<script src="assets/vendor/isotope/isotope.pkgd.min.js"></script> 
+		<script src="assets/vendor/isotope/packery-mode.pkgd.min.js"></script> 
+		<script src="assets/vendor/fancybox/js/fancybox.umd.js"></script> 
+		<script src="assets/vendor/swiper/js/swiper-bundle.min.js"></script> 
+
+		<!-- Master JS -->
+		<script src="assets/js/theme.js"></script>
+
+		 <script>
+		 (function(){
+			var iframe = document.getElementById('mainBanner');
+			var loaderEl = document.getElementById('al-loader');
+			var MIN_MS = 900, MAX_MS = 20000, start = Date.now(), done = false;
+
+			function reveal(){
+				if(done) return; done = true;
+				document.body.style.visibility = 'visible';
+				if(loaderEl){
+					loaderEl.classList.add('al-hide');
+					setTimeout(function(){ if(loaderEl.parentNode) loaderEl.parentNode.removeChild(loaderEl); }, 700);
+				}
+			}
+
+			function whenWindowLoaded(){
+				return new Promise(function(resolve){
+					if(document.readyState === 'complete') return resolve();
+					window.addEventListener('load', resolve, {once:true});
+				});
+			}
+
+			function whenIframeLoaded(){
+				return new Promise(function(resolve){
+					if(!iframe){ resolve(); return; }
+					var settled = false;
+					function mark(){ if(settled) return; settled = true; resolve(); }
+					iframe.addEventListener('load', mark, {once:true});
+					setTimeout(mark, 15000);
+				});
+			}
+
+			Promise.all([whenWindowLoaded(), whenIframeLoaded()]).then(function(){
+				setTimeout(reveal, Math.max(0, MIN_MS - (Date.now() - start)));
+			});
+
+			setTimeout(reveal, MAX_MS);
+		 })();
+		  </script>
+
+
+
+
+	</body>
+
+</html>

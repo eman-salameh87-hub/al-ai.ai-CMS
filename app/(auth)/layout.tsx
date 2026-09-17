@@ -33,6 +33,9 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: settings?.siteName ? `${settings.siteName} — ${title}` : title,
     robots: { index: false, follow: false },
+    // Its own root layout, same as (admin)'s — see that layout's matching
+    // comment on why settings.favicon needs setting here explicitly too.
+    icons: settings?.favicon ? { icon: settings.favicon } : undefined,
   };
 }
 

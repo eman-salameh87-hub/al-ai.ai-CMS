@@ -1,21 +1,44 @@
 // components/site/navbar.tsx
+//
+// Renders the LITERAL markup from al-ai.ai-pages/index.html's <header
+// id="tt-header">, not a Tailwind re-approximation — same element ids and
+// tt-*/pgi-*/pcli-* class names theme-black.css and theme.js already target
+// (see app/(site)/[locale]/layout.tsx, which loads those files as-is). That
+// is what lets theme.js's own jQuery bindings (mobile menu open/close,
+// magnetic-cursor hover, submenu behaviour) attach for free — no React state
+// duplicates what theme.js already does.
+//
+// Content stays admin-editable: `navigation` and `logo`/`siteName` still come
+// from the CMS (getNavigation / settings), only the markup they render into
+// changed. A top-level item with children (only "Services" today) renders
+// index.html's Services dropdown (.tt-submenu-wrap / .tt-submenu-list).
+//
+// Two source-template features aren't reproduced here because the source
+// has no equivalent and dropping them would break the bilingual CMS: an
+// EN/AR locale switch (kept, unobtrusive) and search/wishlist/account icons
+// (dropped — this is a content site with eCommerce off, so they're pure
+// noise; commerceOn is threaded through in case a future al-ai.ai variant
+// turns the shop back on).
 'use client';
 
 import Image from 'next/image';
-import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, X, Search, User, Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { ThemeToggle } from './theme-toggle';
 
-/** Shape returned by getNavigation(). Was `any[]`. */
+/** Shape returned by getNavigation(). `parentId` set means this item is a
+ *  Services-style submenu child, not a top-level link. */
 export interface NavItem {
   id: string;
   label: string;
   url: string;
   openInNew: boolean | null;
+  parentId?: string | null;
 }
+
+/** External domain the source's own badge links to (index.html: .tt-btn2
+ *  anchor) — carried over exactly per the reference file, not a guess. */
+const PARTNER_BADGE_URL = 'https://newaeonjo-001-site3.dtempurl.com/';
 
 interface NavbarProps {
   navigation: NavItem[];
@@ -23,162 +46,163 @@ interface NavbarProps {
   /** From settings — never a hardcoded brand string. */
   siteName: string;
   locale: 'ar' | 'en';
-  /** Whether the shop is switched on; hides the account link when it is not. */
+  /** Whether the shop is switched on; unused today (see file header) but
+   *  kept so a future al-ai.ai variant with commerce on doesn't need a
+   *  signature change here too. */
   commerceOn?: boolean;
-  /** False when the site has no dark colours saved: nothing to switch to. */
+  /** No source equivalent (the design has no theme toggle); accepted and
+   *  unused so the layout's call site doesn't need touching too. */
   showThemeToggle?: boolean;
 }
 
-export function Navbar({
-  navigation,
-  logo,
-  siteName,
-  locale,
-  commerceOn = false,
-  showThemeToggle = false,
-}: NavbarProps) {
-  const [mobileOpen, setMobileOpen] = useState(false);
+export function Navbar({ navigation, logo, siteName, locale }: NavbarProps) {
   const pathname = usePathname();
-
-  const otherLocale = locale === 'ar' ? 'en' : 'ar';
-
-  // Replace only the leading locale segment. A blind `.replace('/ar', …)`
-  // would corrupt a path like /ar/library/archive.
-  const swappedPath = pathname.replace(new RegExp(`^/${locale}(?=/|$)`), `/${otherLocale}`);
 
   // Nav URLs stored in the DB are locale-agnostic ("/about"); prefix them so
   // links do not escape the current locale.
   const localized = (url: string) =>
     /^https?:\/\//i.test(url) ? url : `/${locale}${url.startsWith('/') ? url : `/${url}`}`;
 
+  const topLevel = navigation.filter((item) => !item.parentId);
+
   return (
-    <nav className="sticky top-0 z-50 border-b border-site-line bg-site-surface/80 backdrop-blur-md">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 gap-4">
-          <Link
-            href={`/${locale}`}
-            className="flex items-center gap-2 shrink-0"
-            data-test-id="navbar-home"
+    // tt-header-filled: the source's permanently-solid header variant (as
+    // opposed to tt-header-alter's default transparent-over-hero state) —
+    // matches index.html exactly, which uses both classes together.
+    <header id="tt-header" className="tt-header-alter tt-header-filled">
+      <div className="tt-header-inner tt-noise">
+        <div className="tt-header-col tt-header-col-left">
+          <div className="tt-logo">
+            <Link href={`/${locale}`} className="tt-magnetic-item" data-test-id="navbar-home">
+              {logo ? (
+                <>
+                  <Image src={logo} alt={siteName} width={160} height={40} priority className="tt-logo-light" />
+                  <Image src={logo} alt={siteName} width={160} height={40} priority className="tt-logo-dark" />
+                </>
+              ) : (
+                // No logo saved yet in settings — index.html has no text
+                // fallback (it's always an image), so this is a plain
+                // legible stand-in rather than an attempt to fake the mark.
+                // Plain Tailwind, not a tt-* class: there's no source rule
+                // for this state to hook into.
+                <span className="text-xl font-bold text-white">{siteName}</span>
+              )}
+            </Link>
+          </div>
+        </div>
+
+        <div className="tt-header-col tt-header-col-center">
+          <nav className="tt-main-menu tt-m-menu-center">
+            <div className="tt-main-menu-holder">
+              <div className="tt-main-menu-inner">
+                <div className="tt-main-menu-content">
+                  <ul className="tt-main-menu-list">
+                    {topLevel.map((item) => {
+                      const href = localized(item.url);
+                      const active = pathname === href;
+                      const children = navigation.filter((child) => child.parentId === item.id);
+
+                      if (children.length === 0) {
+                        return (
+                          <li key={item.id} className={active ? 'active' : undefined}>
+                            <Link
+                              href={href}
+                              target={item.openInNew ? '_blank' : undefined}
+                              rel={item.openInNew ? 'noopener noreferrer' : undefined}
+                              aria-current={active ? 'page' : undefined}
+                              data-test-id={`navbar-link-${item.id}`}
+                            >
+                              {item.label}
+                            </Link>
+                          </li>
+                        );
+                      }
+
+                      return (
+                        <li
+                          key={item.id}
+                          className={cn('tt-submenu-wrap tt-submenu-master', active && 'active')}
+                        >
+                          <div className="tt-submenu-trigger">
+                            <Link href={href} data-test-id={`navbar-link-${item.id}`}>
+                              {item.label}
+                            </Link>
+                          </div>
+                          <div className="tt-submenu">
+                            <ul className="tt-submenu-list">
+                              {children.map((child) => (
+                                <li key={child.id}>
+                                  <Link href={localized(child.url)} data-test-id={`navbar-sublink-${child.id}`}>
+                                    {child.label}
+                                  </Link>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </nav>
+        </div>
+
+        <div className="tt-header-col tt-header-col-right">
+          {/* Pure markup — theme.js binds the open/close click handler and
+              GSAP animation to #tt-m-menu-toggle-btn-wrap itself, so no
+              React state duplicates that here (see the file header note). */}
+          <div id="tt-m-menu-toggle-btn-wrap">
+            <div className="tt-m-menu-toggle-btn-text">
+              <span className="tt-m-menu-text-menu">{locale === 'ar' ? 'القائمة' : 'Menu'}</span>
+              <span className="tt-m-menu-text-close">{locale === 'ar' ? 'إغلاق' : 'Close'}</span>
+            </div>
+            <div className="tt-m-menu-toggle-btn-holder">
+              <a href="#" className="tt-m-menu-toggle-btn" data-test-id="navbar-menu-toggle">
+                <span></span>
+              </a>
+            </div>
+          </div>
+
+          {/* The header-corner partner badge, matching the reference
+              index.html exactly — same external target, same image, same
+              pill styling. `.tt-btn2`'s actual rules (border-radius: 50px,
+              padding, inline-flex, etc.) live in index.html's own inline
+              <style> block, not in theme-black.css, so they're reproduced
+              here as an inline style rather than a class that doesn't
+              exist in the loaded stylesheet. */}
+          <a
+            href={PARTNER_BADGE_URL}
+            className="tt-btn2 tt-btn-secondary tt-magnetic-item"
+            style={{
+              position: 'relative',
+              display: 'inline-flex',
+              alignItems: 'center',
+              backgroundColor: '#fff',
+              padding: '3px 15px',
+              textTransform: 'uppercase',
+              textAlign: 'center',
+              fontSize: '15px',
+              fontWeight: 500,
+              overflow: 'hidden',
+              cursor: 'pointer',
+              letterSpacing: '0.5px',
+              border: 'none',
+              borderRadius: '50px',
+              zIndex: 9,
+            }}
           >
-            {logo ? (
-              <Image
-                src={logo}
-                alt={siteName}
-                width={160}
-                height={32}
-                priority
-                className="h-8 w-auto"
-              />
-            ) : (
-              <span className="text-xl font-bold text-site-ink">{siteName}</span>
-            )}
-          </Link>
-
-          <div className="hidden md:flex items-center gap-8">
-            {navigation.map((item) => {
-              const href = localized(item.url);
-              return (
-                <Link
-                  key={item.id}
-                  href={href}
-                  target={item.openInNew ? '_blank' : undefined}
-                  rel={item.openInNew ? 'noopener noreferrer' : undefined}
-                  aria-current={pathname === href ? 'page' : undefined}
-                  data-test-id={`navbar-link-${item.id}`}
-                  className={cn(
-                    'text-sm font-medium transition-colors hover:text-site-ink',
-                    pathname === href
-                      ? 'text-site-ink'
-                      : 'text-site-ink-muted'
-                  )}
-                >
-                  {item.label}
-                </Link>
-              );
-            })}
-          </div>
-
-          {/* Tighter on phones: this row now holds six controls, and at 390px
-              the old gap-2 pushed the menu button off the edge — a horizontal
-              scrollbar on every page. Unchanged from sm upwards. */}
-          <div className="flex items-center gap-0.5 sm:gap-2">
-            <Link
-              href={`/${locale}/search`}
-              aria-label={locale === 'ar' ? 'بحث' : 'Search'}
-              data-test-id="navbar-search"
-              className="rounded-full p-1.5 hover:bg-site-surface-raised sm:p-2"
-            >
-              <Search size={20} aria-hidden="true" />
-            </Link>
-
-            {/* Only when there is a shop: an account here exists to show order
-                history, so it is meaningless on a content-only site. */}
-            {commerceOn && (
-              <Link
-                href={`/${locale}/account/wishlist`}
-                aria-label={locale === 'ar' ? 'المفضّلة' : 'Wishlist'}
-                data-test-id="navbar-wishlist"
-                className="rounded-full p-1.5 hover:bg-site-surface-raised sm:p-2"
-              >
-                <Heart size={20} aria-hidden="true" />
-              </Link>
-            )}
-
-            {commerceOn && (
-              <Link
-                href={`/${locale}/account`}
-                aria-label={locale === 'ar' ? 'حسابي' : 'My account'}
-                data-test-id="navbar-account"
-                className="rounded-full p-1.5 hover:bg-site-surface-raised sm:p-2"
-              >
-                <User size={20} aria-hidden="true" />
-              </Link>
-            )}
-
-            {showThemeToggle && <ThemeToggle locale={locale} />}
-
-            <Link
-              href={swappedPath}
-              hrefLang={otherLocale}
-              aria-label={locale === 'ar' ? 'Switch to English' : 'التبديل إلى العربية'}
-              data-test-id="navbar-locale-switch"
-              className="rounded-full bg-site-surface-raised px-2 py-1 text-sm font-medium hover:bg-site-line sm:px-3"
-            >
-              {locale === 'ar' ? 'EN' : 'عربي'}
-            </Link>
-
-            <button
-              type="button"
-              className="md:hidden p-2"
-              onClick={() => setMobileOpen((v) => !v)}
-              aria-expanded={mobileOpen}
-              aria-controls="navbar-mobile"
-              aria-label={locale === 'ar' ? 'القائمة' : 'Menu'}
-              data-test-id="navbar-menu-toggle"
-            >
-              {mobileOpen ? <X size={24} aria-hidden="true" /> : <Menu size={24} aria-hidden="true" />}
-            </button>
-          </div>
+            <Image
+              src="/al-ai-pages/revacity.png"
+              alt="Revacity"
+              width={100}
+              height={24}
+              style={{ width: '100px', maxWidth: 'fit-content' }}
+            />
+          </a>
         </div>
       </div>
-
-      {mobileOpen && (
-        <div id="navbar-mobile" className="border-t border-site-line bg-site-surface md:hidden">
-          <div className="px-4 py-3 flex flex-col gap-1">
-            {navigation.map((item) => (
-              <Link
-                key={item.id}
-                href={localized(item.url)}
-                onClick={() => setMobileOpen(false)}
-                className="py-3 text-sm font-medium text-site-ink-muted hover:text-site-ink"
-                data-test-id={`navbar-mobile-link-${item.id}`}
-              >
-                {item.label}
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
-    </nav>
+    </header>
   );
 }

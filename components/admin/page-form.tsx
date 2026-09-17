@@ -22,7 +22,7 @@ import type { ContentTypeSlug } from '@/lib/content/content-types';
 
 export type { PageFormValue, TranslationDraft };
 
-const LOCALES: ReadonlyArray<'ar' | 'en'> = ['ar', 'en'];
+const LOCALES: ReadonlyArray<'ar' | 'en'> = ['en', 'ar'];
 const LOCALE_KEY: Record<'ar' | 'en', MessageKey> = { ar: 'form.localeAr', en: 'form.localeEn' };
 
 interface PageFormProps {
@@ -61,7 +61,7 @@ export function PageForm({
   const labels = TYPE_LABEL[contentType];
   const router = useRouter();
   const [value, setValue] = useState<PageFormValue>(initial);
-  const [activeLocale, setActiveLocale] = useState<'ar' | 'en'>('ar');
+  const [activeLocale, setActiveLocale] = useState<'ar' | 'en'>('en');
   /**
    * Bumped whenever the section list is replaced wholesale rather than edited.
    * BlockBuilder keeps per-block React keys so a TipTap editor stays attached
