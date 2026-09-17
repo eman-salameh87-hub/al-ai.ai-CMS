@@ -49,7 +49,7 @@ export async function GET(
   const ext = key.split('.').pop()?.toLowerCase() ?? '';
   const contentType = EXT_TO_MIME[ext] ?? 'application/octet-stream';
 
-  return new NextResponse(file.body, {
+  return new NextResponse(new Uint8Array(file.body), {
     headers: {
       'Content-Type': contentType,
       // Filenames are server-generated UUIDs; a given URL is never reused
